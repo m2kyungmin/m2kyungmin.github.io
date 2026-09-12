@@ -1,3 +1,4 @@
+# 매일 Claude로 글 1편을 생성해 커밋하고 배포를 트리거합니다.
 name: Daily post generation
 on:
   schedule:
