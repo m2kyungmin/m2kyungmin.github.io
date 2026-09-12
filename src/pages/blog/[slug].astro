@@ -1,0 +1,39 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import Coupang from "../../components/Coupang.astro";
+import { getCollection, render } from "astro:content";
+import { getCalc } from "../../lib/site";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = await render(post);
+const calc = post.data.calc ? getCalc(post.data.calc) : undefined;
+const iso = post.data.pubDate.toISOString();
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: iso,
+  dateModified: iso,
+  author: { "@type": "Organization", name: "머니계산기" },
+  mainEntityOfPage: new URL(`/blog/${post.id}`, Astro.site).toString(),
+};
+---
+<Base title={post.data.title} description={post.data.description} keywords={post.data.tags} jsonLd={jsonLd} type="article" publishedTime={iso}>
+  <nav class="crumbs"><a href="/">홈</a> › <a href="/blog">블로그</a></nav>
+  <article class="post">
+    <h1>{post.data.title}</h1>
+    <p class="post-meta">{iso.slice(0, 10)} · {post.data.tags.join(", ")}</p>
+    <AdSlot position="top" />
+    {calc && <p class="card">🧮 직접 계산해 보세요 → <a href={`/calc/${calc.slug}`}><strong>{calc.title}</strong></a></p>}
+    <Content />
+    <AdSlot position="bottom" />
+    <Coupang keywords={post.data.products} />
+    {calc && <p class="card">🧮 <a href={`/calc/${calc.slug}`}><strong>{calc.title}</strong></a>로 내 경우를 바로 계산해 보세요.</p>}
+  </article>
+</Base>

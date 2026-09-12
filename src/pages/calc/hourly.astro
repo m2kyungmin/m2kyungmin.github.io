@@ -1,0 +1,126 @@
+---
+import CalcShell from "../../components/CalcShell.astro";
+const faq = [
+  { q: "주휴수당은 누구나 받을 수 있나요?", a: "1주 소정근로시간이 15시간 이상이고, 그 주에 결근 없이 개근했다면 근로기준법상 주휴수당을 받을 수 있습니다. 아르바이트·시간제 근로자도 조건을 충족하면 동일하게 적용됩니다." },
+  { q: "주휴수당은 어떻게 계산하나요?", a: "주휴시간 = (1주 실제 근무시간 ÷ 40) × 8시간이며, 최대 8시간까지만 인정됩니다. 여기에 시급을 곱하면 주휴수당 금액이 됩니다." },
+  { q: "월급은 왜 주급에 4.345를 곱하나요?", a: "1년은 평균 52.14주이고 12개월로 나누면 한 달은 평균 4.345주입니다. 그래서 주급 × 4.345로 월 환산 급여를 계산합니다." },
+  { q: "연장근로수당은 어떻게 반영되나요?", a: "주 40시간을 초과하는 연장근로는 통상시급의 1.5배로 계산해 더합니다. 이 계산기의 연장근로시간 입력란에 주간 연장근로시간을 넣으면 자동 반영됩니다." },
+  { q: "2026년 최저시급은 얼마인가요?", a: "2026년 최저시급은 시간당 10,320원입니다. 8시간 기준 일급은 82,560원, 주 40시간 기준 월 환산액은 약 2,156,880원(주휴수당 포함)입니다." },
+];
+// 2026년 최저시급(고용노동부 고시). 매년 이 값만 갱신하면 됩니다.
+const MIN_WAGE_2026 = 10320;
+---
+<CalcShell slug="hourly" faq={faq} products={["출퇴근 기록 다이어리", "무선 이어폰", "보온 도시락통"]}>
+  <form id="f" onsubmit="return false">
+    <label for="wage">시급 (원)</label>
+    <input type="number" id="wage" value={MIN_WAGE_2026} min="0" step="10" inputmode="numeric" />
+    <p class="hint">2026년 최저시급 {MIN_WAGE_2026.toLocaleString("ko-KR")}원 기준값이 기본으로 입력되어 있습니다.</p>
+    <div class="row">
+      <div>
+        <label for="dailyHours">하루 근무시간</label>
+        <input type="number" id="dailyHours" value="8" min="0" max="24" step="0.5" />
+      </div>
+      <div>
+        <label for="days">주 근무일수</label>
+        <input type="number" id="days" value="5" min="1" max="7" step="1" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="overtime">연장근로시간 (주, 1.5배)</label>
+        <input type="number" id="overtime" value="0" min="0" max="60" step="0.5" />
+      </div>
+      <div>
+        <label for="holidayToggle">주휴수당</label>
+        <div class="seg">
+          <label><input type="checkbox" id="holidayToggle" checked /><span>포함해서 계산</span></label>
+        </div>
+      </div>
+    </div>
+    <p class="hint" id="eligHint"></p>
+    <button class="btn" id="go">계산하기</button>
+  </form>
+  <div class="result" id="out" hidden>
+    <div>예상 월급 (주휴수당 포함 시)</div>
+    <div class="big" id="monthly"></div>
+    <div class="muted small">주급 <strong id="weekly"></strong> · 연봉 환산 <strong id="annual"></strong></div>
+    <table>
+      <tr><th>항목</th><th>금액</th></tr>
+      <tr><td>기본 주급 (시급 × 주 근무시간)</td><td id="basePay"></td></tr>
+      <tr><td>연장근로수당 (1.5배)</td><td id="otPay"></td></tr>
+      <tr><td>주휴수당</td><td id="holidayPay"></td></tr>
+      <tr class="total"><td>주 합계</td><td id="weekTotal"></td></tr>
+      <tr><td>월 환산 (× 4.345)</td><td id="monthTotal"></td></tr>
+      <tr><td>연 환산</td><td id="yearTotal"></td></tr>
+    </table>
+    <p class="hint">세전 금액이며, 4대보험료·소득세는 포함되어 있지 않습니다. 실수령액은 연봉 계산기를 참고하세요.</p>
+  </div>
+
+  <div slot="guide">
+    <h2>주휴수당 지급 조건</h2>
+    <p>주휴수당은 <strong>1주 소정근로시간 15시간 이상</strong>이면서 그 주에 <strong>결근 없이 개근</strong>한 근로자에게 유급휴일 수당으로 지급됩니다. 정규직뿐 아니라 아르바이트, 단시간 근로자도 조건만 충족하면 지급 대상입니다.</p>
+    <h2>주휴수당 계산식</h2>
+    <table>
+      <tr><th>구분</th><th>계산식</th></tr>
+      <tr><td>주휴시간</td><td>(1주 실근무시간 ÷ 40) × 8시간, 최대 8시간</td></tr>
+      <tr><td>주휴수당</td><td>주휴시간 × 시급</td></tr>
+      <tr><td>연장근로수당</td><td>연장근로시간 × 시급 × 1.5</td></tr>
+      <tr><td>월 환산액</td><td>주급 합계 × 4.345 (연 52.14주 ÷ 12개월)</td></tr>
+    </table>
+    <h2>연도별 최저시급</h2>
+    <table>
+      <tr><th>연도</th><th>시급</th><th>일급 (8시간)</th></tr>
+      <tr><td>2022년</td><td>9,160원</td><td>73,280원</td></tr>
+      <tr><td>2023년</td><td>9,620원</td><td>76,960원</td></tr>
+      <tr><td>2024년</td><td>9,860원</td><td>78,880원</td></tr>
+      <tr><td>2025년</td><td>10,030원</td><td>80,240원</td></tr>
+      <tr><td>2026년</td><td>10,320원</td><td>82,560원</td></tr>
+    </table>
+    <p class="hint">고용노동부 고시 기준이며, 매년 8월 다음 연도 최저시급이 발표됩니다.</p>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
+
+    function run(){
+      const wage = +$("wage").value || 0;
+      const dailyHours = +$("dailyHours").value || 0;
+      const days = +$("days").value || 0;
+      const overtime = +$("overtime").value || 0;
+      const weeklyHours = dailyHours * days;
+      const eligible = weeklyHours >= 15;
+
+      $("eligHint").textContent = eligible
+        ? `주 ${weeklyHours}시간 근무로 주휴수당 지급 조건(15시간 이상)을 충족합니다.`
+        : `주 ${weeklyHours}시간 근무는 15시간 미만으로 주휴수당 지급 조건에 해당하지 않습니다.`;
+
+      const holidayToggle = $("holidayToggle");
+      if (!eligible) holidayToggle.checked = false;
+
+      const basePay = wage * weeklyHours;
+      const otPay = wage * 1.5 * overtime;
+      const holidayHours = eligible ? Math.min(8, (weeklyHours / 40) * 8) : 0;
+      const holidayPay = holidayToggle.checked ? wage * holidayHours : 0;
+      const weekTotal = basePay + otPay + holidayPay;
+      const monthTotal = weekTotal * 4.345;
+      const yearTotal = monthTotal * 12;
+
+      $("basePay").textContent = won(basePay);
+      $("otPay").textContent = won(otPay);
+      $("holidayPay").textContent = won(holidayPay);
+      $("weekTotal").textContent = won(weekTotal);
+      $("monthTotal").textContent = won(monthTotal);
+      $("yearTotal").textContent = won(yearTotal);
+      $("monthly").textContent = won(monthTotal);
+      $("weekly").textContent = won(weekTotal);
+      $("annual").textContent = won(yearTotal);
+      $("out").hidden = false;
+    }
+
+    $("go").addEventListener("click", run);
+    ["wage","dailyHours","days","overtime"].forEach((id) => $(id).addEventListener("input", run));
+    $("holidayToggle").addEventListener("change", run);
+    run();
+  </script>
+</CalcShell>

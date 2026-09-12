@@ -1,0 +1,80 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "./AdSlot.astro";
+import Coupang from "./Coupang.astro";
+import { CALCS, getCalc } from "../lib/site";
+import { getCollection } from "astro:content";
+
+interface Props {
+  slug: string;
+  faq?: { q: string; a: string }[];
+  products?: string[];
+}
+const { slug, faq = [], products = [] } = Astro.props;
+const calc = getCalc(slug)!;
+const related = CALCS.filter((c) => c.slug !== slug && c.category === calc.category).concat(
+  CALCS.filter((c) => c.slug !== slug && c.category !== calc.category)
+).slice(0, 4);
+const posts = (await getCollection("blog")).filter((p) => p.data.calc === slug).sort((a, b) => +b.data.pubDate - +a.data.pubDate).slice(0, 5);
+
+const jsonLd: Record<string, unknown>[] = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: calc.title,
+    description: calc.description,
+    applicationCategory: "FinanceApplication",
+    operatingSystem: "Any",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
+    url: new URL(`/calc/${slug}`, Astro.site).toString(),
+  },
+];
+if (faq.length) {
+  jsonLd.push({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+  });
+}
+---
+<Base title={calc.title} description={calc.description} keywords={calc.keywords} jsonLd={jsonLd}>
+  <nav class="crumbs"><a href="/">홈</a> › <a href="/calc">계산기</a> › {calc.short}</nav>
+  <h1>{calc.emoji} {calc.title}</h1>
+  <p class="lead">{calc.description}</p>
+  <AdSlot position="top" />
+  <section class="card calc">
+    <slot />
+  </section>
+  <section class="prose">
+    <slot name="guide" />
+  </section>
+  {faq.length > 0 && (
+    <section class="prose">
+      <h2>자주 묻는 질문</h2>
+      {faq.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </section>
+  )}
+  <AdSlot position="bottom" />
+  <Coupang keywords={products} />
+  {posts.length > 0 && (
+    <section>
+      <h2>관련 글</h2>
+      <ul class="list">
+        {posts.map((p) => <li><a href={`/blog/${p.id}`}>{p.data.title}</a></li>)}
+      </ul>
+    </section>
+  )}
+  <section>
+    <h2>다른 계산기</h2>
+    <div class="grid">
+      {related.map((c) => (
+        <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.short}</strong><small>{c.description}</small></a>
+      ))}
+    </div>
+  </section>
+</Base>

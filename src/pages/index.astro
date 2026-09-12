@@ -1,0 +1,33 @@
+---
+import Base from "../layouts/Base.astro";
+import AdSlot from "../components/AdSlot.astro";
+import { SITE, CALCS, CATEGORIES } from "../lib/site";
+import { getCollection } from "astro:content";
+const posts = (await getCollection("blog")).sort((a, b) => +b.data.pubDate - +a.data.pubDate).slice(0, 6);
+---
+<Base title={SITE.name} description={SITE.description}>
+  <section class="hero">
+    <h1>💸 {SITE.name}</h1>
+    <p class="lead">{SITE.tagline}</p>
+  </section>
+  {CATEGORIES.map((cat) => (
+    <section class="cat">
+      <h2>{cat}</h2>
+      <div class="grid">
+        {CALCS.filter((c) => c.category === cat).map((c) => (
+          <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.title}</strong><small>{c.description}</small></a>
+        ))}
+      </div>
+    </section>
+  ))}
+  <AdSlot position="bottom" />
+  {posts.length > 0 && (
+    <section class="cat">
+      <h2>최신 글</h2>
+      <ul class="list">
+        {posts.map((p) => <li><a href={`/blog/${p.id}`}>{p.data.title}</a> <span class="post-meta">{p.data.pubDate.toISOString().slice(0, 10)}</span></li>)}
+      </ul>
+      <p><a href="/blog">블로그 전체 보기 →</a></p>
+    </section>
+  )}
+</Base>

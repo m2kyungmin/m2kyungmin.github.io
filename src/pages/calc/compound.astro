@@ -1,0 +1,142 @@
+---
+import CalcShell from "../../components/CalcShell.astro";
+const faq = [
+  { q: "예금과 적금은 왜 만기 이자가 다른가요?", a: "예금은 처음부터 목돈 전체가 이자를 받지만, 적금은 매월 납입한 돈이 각각 다른 기간만큼만 이자를 받기 때문에 같은 금리·같은 원금이라도 적금의 실효 이자가 예금보다 훨씬 적습니다." },
+  { q: "이자소득세는 얼마나 떼나요?", a: "일반과세는 이자소득세 14%와 지방소득세 1.4%를 더해 15.4%를 원천징수합니다. 세금우대(일부 조합 등)는 9.5%, 비과세종합저축 등은 0%가 적용됩니다." },
+  { q: "정기적금 이자는 어떻게 계산하나요?", a: "매월 납입액 × 연이율 ÷ 12 × n(n+1)/2 (n=납입 개월 수) 공식을 사용합니다. 이는 각 회차 납입금이 만기까지 남은 개월 수만큼만 이자를 받는 단리 방식입니다." },
+  { q: "월복리와 단리는 얼마나 차이 나나요?", a: "기간이 길고 금리가 높을수록 차이가 커집니다. 1년 이하 단기 예금은 차이가 미미하지만, 3년 이상 장기라면 월복리가 단리보다 눈에 띄게 유리합니다." },
+  { q: "72의 법칙이 뭔가요?", a: "72를 연이율(%)로 나누면 원금이 2배가 되는 데 걸리는 대략적인 연수를 알 수 있는 어림 계산법입니다. 예를 들어 연 6%라면 72÷6=12년 후 원금이 두 배가 됩니다." },
+];
+---
+<CalcShell slug="compound" faq={faq} products={["가계부 다이어리", "재테크 책", "저금통"]}>
+  <form id="f" onsubmit="return false">
+    <label>계산 유형</label>
+    <div class="seg">
+      <label><input type="radio" name="mode" value="deposit" checked /><span>정기예금</span></label>
+      <label><input type="radio" name="mode" value="savings" /><span>정기적금</span></label>
+      <label><input type="radio" name="mode" value="goal" /><span>목표금액 역산</span></label>
+    </div>
+    <label for="amount" id="amountLabel">예치금액 (원)</label>
+    <input type="number" id="amount" value="10000000" min="0" step="10000" inputmode="numeric" />
+    <div class="row">
+      <div>
+        <label for="months">기간 (개월)</label>
+        <input type="number" id="months" value="12" min="1" max="600" step="1" />
+      </div>
+      <div>
+        <label for="rate">연이율 (%)</label>
+        <input type="number" id="rate" value="3.5" min="0" max="30" step="0.01" />
+      </div>
+    </div>
+    <label for="taxType">이자과세 구분</label>
+    <select id="taxType">
+      <option value="0.154" selected>일반과세 (15.4%)</option>
+      <option value="0.095">세금우대 (9.5%)</option>
+      <option value="0">비과세 (0%)</option>
+    </select>
+    <button class="btn" id="go">계산하기</button>
+  </form>
+  <div class="result" id="out" hidden>
+    <div id="mainLabel">만기 수령액 (복리)</div>
+    <div class="big" id="mainOut"></div>
+    <div class="muted small" id="goalNote" hidden>필요한 월 납입액 <strong id="reqMonthly"></strong></div>
+    <table>
+      <tr><th>항목</th><th>금액</th></tr>
+      <tr id="rowMonthly" hidden><td>월 납입액</td><td id="monthlyPay"></td></tr>
+      <tr><td>원금 합계</td><td id="principal"></td></tr>
+      <tr id="rowSimple" hidden><td>세전 이자 (단리)</td><td id="interestSimple"></td></tr>
+      <tr><td>세전 이자 (복리)</td><td id="interestCompound"></td></tr>
+      <tr><td>이자소득세</td><td id="taxAmt"></td></tr>
+      <tr><td>세후 이자</td><td id="interestNet"></td></tr>
+      <tr class="total"><td>세후 만기 수령액</td><td id="finalAmt"></td></tr>
+    </table>
+    <p class="hint" id="cmpHint"></p>
+  </div>
+
+  <div slot="guide">
+    <h2>예금 vs 적금, 같은 금리라도 이자는 다릅니다</h2>
+    <p>연 4% 금리로 1,200만원을 굴린다고 가정하면, 정기예금은 1,200만원 전체가 1년 내내 이자를 받지만 정기적금은 매월 100만원씩 나눠 넣으므로 평균적으로 절반 정도의 기간에 대해서만 이자가 붙습니다.</p>
+    <table>
+      <tr><th>구분</th><th>원금</th><th>연 4% 세전 이자 (1년)</th></tr>
+      <tr><td>정기예금 (목돈 1,200만원)</td><td>1,200만원</td><td>약 48만원</td></tr>
+      <tr><td>정기적금 (매월 100만원)</td><td>1,200만원</td><td>약 26만원</td></tr>
+    </table>
+    <h2>이자소득세 설명</h2>
+    <p>이자소득에는 이자소득세 14% + 지방소득세 1.4% = <strong>15.4%</strong>가 원천징수됩니다. 새마을금고·신협 등의 세금우대저축은 9.5%, 비과세종합저축(고령자·장애인 등 대상)은 0%가 적용될 수 있습니다.</p>
+    <h2>72의 법칙</h2>
+    <p>원금이 2배가 되는 기간(년) ≈ 72 ÷ 연이율(%). 연 6%면 약 12년, 연 4%면 약 18년이 걸린다는 뜻으로, 복리 효과를 빠르게 어림하는 데 유용합니다.</p>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
+
+    function run(){
+      const mode = document.querySelector('input[name=mode]:checked').value;
+      const amount = +$("amount").value || 0;
+      const months = Math.max(1, +$("months").value || 1);
+      const ratePct = +$("rate").value || 0;
+      const r = ratePct/100;
+      const taxRate = +$("taxType").value;
+
+      $("rowMonthly").hidden = mode === "deposit";
+      $("rowSimple").hidden = mode !== "deposit";
+      $("goalNote").hidden = mode !== "goal";
+
+      let principal, interestCompound, interestSimple, monthlyPay, finalAmt, mainLabel;
+
+      if(mode === "deposit"){
+        principal = amount;
+        interestCompound = principal * (Math.pow(1+r/12, months) - 1);
+        interestSimple = principal * r * (months/12);
+        mainLabel = "만기 수령액 (월복리)";
+        $("cmpHint").textContent = `같은 조건 단리라면 세전 이자는 ${won(interestSimple)}로, 복리 대비 ${won(interestCompound-interestSimple)} 적습니다.`;
+      } else if(mode === "savings"){
+        monthlyPay = amount;
+        principal = monthlyPay * months;
+        const rm = r/12;
+        interestCompound = monthlyPay * rm * months*(months+1)/2;
+        mainLabel = "만기 수령액 (단리 적금)";
+        $("cmpHint").textContent = "정기적금은 매월 납입금마다 남은 기간만큼만 이자가 붙는 단리 방식으로 계산됩니다.";
+      } else {
+        // 목표금액 역산: amount = 목표금액(세전 만기수령액 기준)
+        const rm = r/12;
+        const denom = months + rm*months*(months+1)/2;
+        monthlyPay = denom > 0 ? amount/denom : 0;
+        principal = monthlyPay * months;
+        interestCompound = monthlyPay * rm * months*(months+1)/2;
+        mainLabel = "필요한 월 납입액";
+        $("reqMonthly").textContent = won(monthlyPay);
+        $("cmpHint").textContent = `매월 ${won(monthlyPay)}씩 ${months}개월 납입하면 세전 기준 목표금액 ${won(amount)}에 도달합니다 (세후 수령액은 이보다 적습니다).`;
+      }
+
+      const taxAmt = interestCompound * taxRate;
+      const interestNet = interestCompound - taxAmt;
+      finalAmt = principal + interestNet;
+
+      $("principal").textContent = won(principal);
+      if(mode === "deposit") $("interestSimple").textContent = won(interestSimple);
+      if(mode !== "deposit") $("monthlyPay").textContent = won(monthlyPay);
+      $("interestCompound").textContent = won(interestCompound);
+      $("taxAmt").textContent = won(taxAmt);
+      $("interestNet").textContent = won(interestNet);
+      $("finalAmt").textContent = won(finalAmt);
+
+      $("mainLabel").textContent = mode === "goal" ? mainLabel : "세후 만기 수령액";
+      $("mainOut").textContent = mode === "goal" ? won(monthlyPay) : won(finalAmt);
+      $("out").hidden = false;
+    }
+
+    const labels = { deposit: "예치금액 (원)", savings: "매월 납입액 (원)", goal: "목표 만기금액 (원, 세전 기준)" };
+    document.querySelectorAll('input[name=mode]').forEach(el => el.addEventListener("change", () => {
+      if(!el.checked) return;
+      $("amountLabel").textContent = labels[el.value];
+      if(el.value === "goal") $("amount").value = "30000000"; else if(el.value === "savings") $("amount").value = "500000"; else $("amount").value = "10000000";
+      run();
+    }));
+    $("go").addEventListener("click", run);
+    ["amount","months","rate","taxType"].forEach((id) => $(id).addEventListener("input", run));
+    $("taxType").addEventListener("change", run);
+    run();
+  </script>
+</CalcShell>

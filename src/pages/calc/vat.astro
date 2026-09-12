@@ -1,0 +1,142 @@
+---
+import CalcShell from "../../components/CalcShell.astro";
+const faq = [
+  { q: "부가세는 어떻게 계산하나요?", a: "부가가치세율은 10%입니다. 공급가액이 있다면 공급가액 × 10%가 부가세이고, 합계금액(공급가액+부가세)만 안다면 합계금액 ÷ 1.1이 공급가액입니다." },
+  { q: "세금계산서에는 뭐가 적히나요?", a: "세금계산서에는 공급가액과 부가세를 별도로 구분해 기재해야 합니다. 합계금액만 표시하면 안 되고, 반드시 공급가액란과 세액란이 나뉘어 있어야 적법한 세금계산서입니다." },
+  { q: "간이과세자는 부가세를 다르게 내나요?", a: "간이과세자는 매출액에 업종별 부가가치율을 곱해 세액을 계산하므로 일반과세자보다 세부담이 낮은 경우가 많습니다. 다만 매입세액공제 폭이 제한적입니다." },
+  { q: "프리랜서 3.3% 원천징수는 부가세와 다른가요?", a: "네, 별개입니다. 3.3%(소득세 3%+지방소득세 0.3%)는 프리랜서(사업소득자)에게 지급하는 용역대가에서 원천징수하는 소득세이고, 부가가치세와는 무관합니다." },
+  { q: "원 단위 절사는 왜 필요한가요?", a: "실무에서는 세금계산서 발행 시 부가세 원 단위 미만을 절사(버림)하는 관행이 있습니다. 필요에 따라 절사 옵션을 켜고 끌 수 있습니다." },
+];
+---
+<CalcShell slug="vat" faq={faq} products={["사업자용 세금계산서 도장", "회계 장부", "영수증 파일철"]}>
+  <form id="f" onsubmit="return false">
+    <label>계산 방식</label>
+    <div class="seg">
+      <label><input type="radio" name="mode" value="supply" checked /><span>공급가액 → 합계</span></label>
+      <label><input type="radio" name="mode" value="total" /><span>합계 → 공급가액</span></label>
+      <label><input type="radio" name="mode" value="vatonly" /><span>부가세만 입력</span></label>
+    </div>
+    <label for="amount" id="amountLabel">공급가액 (원)</label>
+    <input type="number" id="amount" value="1000000" min="0" step="1000" inputmode="numeric" />
+    <div class="row">
+      <div>
+        <label for="rate">부가세율</label>
+        <input type="text" id="rate" value="10%" disabled />
+      </div>
+      <div>
+        <label for="roundDown">원 단위 절사</label>
+        <div class="seg">
+          <label><input type="checkbox" id="roundDown" /><span>절사 적용</span></label>
+        </div>
+      </div>
+    </div>
+    <button class="btn" id="go">계산하기</button>
+  </form>
+  <div class="result" id="out" hidden>
+    <div>합계금액</div>
+    <div class="big" id="total"></div>
+    <table>
+      <tr><th>항목</th><th>금액</th></tr>
+      <tr><td>공급가액</td><td id="supply"></td></tr>
+      <tr><td>부가세 (10%)</td><td id="vat"></td></tr>
+      <tr class="total"><td>합계금액</td><td id="total2"></td></tr>
+    </table>
+  </div>
+
+  <h3>프리랜서 3.3% 원천징수 계산</h3>
+  <form id="f2" onsubmit="return false">
+    <label>계산 방향</label>
+    <div class="seg">
+      <label><input type="radio" name="mode2" value="toNet" checked /><span>계약금액 → 실수령액</span></label>
+      <label><input type="radio" name="mode2" value="toGross" /><span>실수령액 → 계약금액</span></label>
+    </div>
+    <label for="amount2" id="amount2Label">계약금액 (원, 세전)</label>
+    <input type="number" id="amount2" value="1000000" min="0" step="1000" inputmode="numeric" />
+    <button class="btn" id="go2">계산하기</button>
+  </form>
+  <div class="result" id="out2" hidden>
+    <table>
+      <tr><th>항목</th><th>금액</th></tr>
+      <tr><td>계약금액 (세전)</td><td id="gross2"></td></tr>
+      <tr><td>원천징수 (3.3%)</td><td id="wh2"></td></tr>
+      <tr class="total"><td>실수령액</td><td id="net2"></td></tr>
+    </table>
+    <p class="hint">3.3% = 사업소득세 3% + 지방소득세 0.3%. 다음 해 5월 종합소득세 신고 시 정산됩니다.</p>
+  </div>
+
+  <div slot="guide">
+    <h2>부가세 계산 공식</h2>
+    <table>
+      <tr><th>알고 있는 값</th><th>계산식</th></tr>
+      <tr><td>공급가액</td><td>부가세 = 공급가액 × 10%, 합계 = 공급가액 × 1.1</td></tr>
+      <tr><td>합계금액</td><td>공급가액 = 합계 ÷ 1.1, 부가세 = 합계 − 공급가액</td></tr>
+      <tr><td>부가세</td><td>공급가액 = 부가세 ÷ 10%, 합계 = 공급가액 + 부가세</td></tr>
+    </table>
+    <h2>세금계산서 발급</h2>
+    <p>일반과세자는 재화·용역을 공급할 때 공급가액과 부가세를 구분해 적은 세금계산서를 발급해야 합니다. 전자세금계산서는 공급일이 속한 달의 다음 달 10일까지 국세청 홈택스로 전송해야 가산세를 피할 수 있습니다.</p>
+    <h2>간이과세자 업종별 부가가치율 (2026년 기준 참고)</h2>
+    <table>
+      <tr><th>업종</th><th>부가가치율</th></tr>
+      <tr><td>소매업, 음식점업</td><td>15%</td></tr>
+      <tr><td>제조업, 농업·임업·어업</td><td>20%</td></tr>
+      <tr><td>숙박업</td><td>25%</td></tr>
+      <tr><td>건설업, 부동산임대업 외</td><td>30%</td></tr>
+      <tr><td>운수업, 통신업</td><td>40%</td></tr>
+    </table>
+    <p class="hint">간이과세자 납부세액 = 매출액 × 부가가치율 × 10%. 실제 요율은 국세청 고시를 확인하세요.</p>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
+    const rnd = (n, down) => down ? Math.floor(n) : Math.round(n);
+
+    function run(){
+      const mode = document.querySelector('input[name=mode]:checked').value;
+      const amount = +$("amount").value || 0;
+      const down = $("roundDown").checked;
+      let supply, vat, total;
+      if(mode === "supply"){ supply = amount; vat = rnd(supply*0.1, down); total = supply+vat; }
+      else if(mode === "total"){ total = amount; supply = rnd(total/1.1, down); vat = total-supply; }
+      else { vat = amount; supply = rnd(vat/0.1, down); total = supply+vat; }
+
+      $("supply").textContent = won(supply);
+      $("vat").textContent = won(vat);
+      $("total").textContent = won(total);
+      $("total2").textContent = won(total);
+      $("out").hidden = false;
+    }
+    const labels = { supply: "공급가액 (원)", total: "합계금액 (원, 공급가액+부가세)", vatonly: "부가세 (원)" };
+    document.querySelectorAll('input[name=mode]').forEach(el => el.addEventListener("change", () => {
+      if(!el.checked) return;
+      $("amountLabel").textContent = labels[el.value];
+      run();
+    }));
+    $("go").addEventListener("click", run);
+    $("amount").addEventListener("input", run);
+    $("roundDown").addEventListener("change", run);
+
+    function run2(){
+      const mode2 = document.querySelector('input[name=mode2]:checked').value;
+      const amount2 = +$("amount2").value || 0;
+      let gross, wh, net;
+      if(mode2 === "toNet"){ gross = amount2; wh = gross*0.033; net = gross-wh; }
+      else { net = amount2; gross = net/(1-0.033); wh = gross-net; }
+      $("gross2").textContent = won(gross);
+      $("wh2").textContent = won(wh);
+      $("net2").textContent = won(net);
+      $("out2").hidden = false;
+    }
+    const labels2 = { toNet: "계약금액 (원, 세전)", toGross: "실수령액 (원)" };
+    document.querySelectorAll('input[name=mode2]').forEach(el => el.addEventListener("change", () => {
+      if(!el.checked) return;
+      $("amount2Label").textContent = labels2[el.value];
+      run2();
+    }));
+    $("go2").addEventListener("click", run2);
+    $("amount2").addEventListener("input", run2);
+
+    run();
+    run2();
+  </script>
+</CalcShell>

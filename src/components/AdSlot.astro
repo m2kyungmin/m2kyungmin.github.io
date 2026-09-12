@@ -1,0 +1,20 @@
+---
+import { ADSENSE_CLIENT, ADSENSE_SLOT_TOP, ADSENSE_SLOT_BOTTOM, ADFIT_UNIT } from "../lib/monetize";
+interface Props { position?: "top" | "bottom" }
+const { position = "top" } = Astro.props;
+const slot = position === "top" ? ADSENSE_SLOT_TOP : ADSENSE_SLOT_BOTTOM;
+const showAdsense = ADSENSE_CLIENT && slot;
+const showAdfit = !showAdsense && ADFIT_UNIT;
+---
+{showAdsense && (
+  <div class="ad">
+    <ins class="adsbygoogle" style="display:block" data-ad-client={ADSENSE_CLIENT} data-ad-slot={slot} data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script set:html="(adsbygoogle=window.adsbygoogle||[]).push({});" />
+  </div>
+)}
+{showAdfit && (
+  <div class="ad">
+    <ins class="kakao_ad_area" style="display:none;" data-ad-unit={ADFIT_UNIT} data-ad-width="320" data-ad-height="100"></ins>
+    <script type="text/javascript" src="//t1.daumcdn.net/kas/static/ba.min.js" async></script>
+  </div>
+)}

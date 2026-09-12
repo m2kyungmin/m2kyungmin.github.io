@@ -1,0 +1,39 @@
+:root{--bg:#f7f8fa;--card:#fff;--text:#1a1d24;--muted:#6b7280;--line:#e5e7eb;--brand:#2563eb;--brand-dark:#1d4ed8;--accent:#16a34a;--r:12px}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:16px}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}
+h1{font-size:1.7rem;margin:.6em 0 .3em}h2{font-size:1.25rem;margin:1.6em 0 .6em}h3{font-size:1.05rem}
+.lead{color:var(--muted);margin-top:0}.muted{color:var(--muted)}.small{font-size:.85rem}
+.site-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.site-header .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:12px}
+.brand{font-weight:800;font-size:1.1rem;color:var(--text);white-space:nowrap}
+.nav{display:flex;gap:14px;overflow-x:auto;font-size:.92rem;white-space:nowrap}.nav a{color:#374151}
+.site-footer{margin-top:48px;padding:24px 0;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.crumbs{font-size:.85rem;color:var(--muted);margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:16px 0}
+.calc label{display:block;font-weight:600;font-size:.92rem;margin:12px 0 4px}
+.calc input[type=number],.calc input[type=text],.calc input[type=date],.calc select{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:8px;font-size:1rem;background:#fff}
+.calc input:focus,.calc select:focus{outline:2px solid var(--brand);border-color:transparent}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:560px){.row{grid-template-columns:1fr}}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.seg label{flex:1;margin:0;text-align:center;border:1px solid #cbd5e1;border-radius:8px;padding:9px;cursor:pointer;font-weight:500}
+.seg input{display:none}.seg input:checked+span{color:var(--brand);font-weight:700}.seg label:has(input:checked){border-color:var(--brand);background:#eff6ff}
+.btn{display:inline-block;margin-top:16px;padding:12px 20px;background:var(--brand);color:#fff;border:0;border-radius:8px;font-size:1rem;font-weight:700;cursor:pointer;width:100%}.btn:hover{background:var(--brand-dark)}
+.result{margin-top:20px;padding:16px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--r)}
+.result .big{font-size:1.8rem;font-weight:800;color:var(--accent);margin:4px 0}
+.result table{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:10px}.result td,.result th{padding:7px 4px;border-bottom:1px solid #d1fae5;text-align:right}.result td:first-child,.result th:first-child{text-align:left}
+.result .total td{font-weight:700}
+.sched{max-height:320px;overflow:auto;font-size:.85rem}
+.hint{font-size:.85rem;color:var(--muted);margin-top:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.tile{display:flex;flex-direction:column;gap:4px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:var(--r);color:var(--text)}.tile:hover{border-color:var(--brand);text-decoration:none}
+.tile .emoji{font-size:1.6rem}.tile small{color:var(--muted);font-size:.8rem;line-height:1.4}
+.list{padding-left:18px}.list li{margin:6px 0}
+.prose p,.prose li{font-size:.98rem}.prose table{width:100%;border-collapse:collapse;font-size:.92rem}.prose td,.prose th{border:1px solid var(--line);padding:8px}.prose th{background:#f3f4f6}
+details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:8px 0;background:#fff}summary{cursor:pointer;font-weight:600}
+.chips{list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}.chips a{display:inline-block;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem}
+.ad{margin:16px 0;min-height:0;text-align:center}
+.post-meta{color:var(--muted);font-size:.9rem}
+.post h2{margin-top:1.4em}.post img{max-width:100%}.post blockquote{border-left:4px solid var(--line);margin:0;padding-left:14px;color:var(--muted)}
+.hero{text-align:center;padding:32px 0 8px}.hero h1{font-size:2rem}.hero p{font-size:1.05rem}
+.cat{margin-top:28px}

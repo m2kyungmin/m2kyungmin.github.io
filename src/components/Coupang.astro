@@ -1,0 +1,14 @@
+---
+import { coupangSearchUrl, COUPANG_ID } from "../lib/monetize";
+interface Props { keywords: string[]; title?: string }
+const { keywords, title = "함께 보면 좋은 상품" } = Astro.props;
+---
+{keywords.length > 0 && (
+  <aside class="card affiliate">
+    <h3>🛒 {title}</h3>
+    <ul class="chips">
+      {keywords.map((k) => <li><a href={coupangSearchUrl(k)} target="_blank" rel="nofollow sponsored noopener">{k}</a></li>)}
+    </ul>
+    {COUPANG_ID && <p class="muted small">쿠팡 파트너스 활동을 통해 일정액의 수수료를 제공받을 수 있습니다.</p>}
+  </aside>
+)}

@@ -1,0 +1,17 @@
+---
+import Base from "../../layouts/Base.astro";
+import { CALCS, CATEGORIES } from "../../lib/site";
+---
+<Base title="전체 계산기" description="연봉, 시급, 퇴직금, 대출, 전월세, 부가세, 예적금, BMI, D-day 등 무료 생활 금융 계산기 전체 목록.">
+  <h1>전체 계산기</h1>
+  {CATEGORIES.map((cat) => (
+    <section class="cat">
+      <h2>{cat}</h2>
+      <div class="grid">
+        {CALCS.filter((c) => c.category === cat).map((c) => (
+          <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.title}</strong><small>{c.description}</small></a>
+        ))}
+      </div>
+    </section>
+  ))}
+</Base>

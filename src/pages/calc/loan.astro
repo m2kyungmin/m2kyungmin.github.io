@@ -1,0 +1,149 @@
+---
+import CalcShell from "../../components/CalcShell.astro";
+const faq = [
+  { q: "원리금균등과 원금균등, 뭐가 더 유리한가요?", a: "총 이자만 보면 원금균등 상환이 원리금균등보다 적습니다. 초기에 원금을 더 많이 갚아 잔액이 빨리 줄기 때문입니다. 다만 초반 상환 부담이 커서 소득이 일정한 경우 원리금균등을, 초기 여유가 있다면 원금균등을 선택하는 경우가 많습니다." },
+  { q: "거치기간은 왜 필요한가요?", a: "거치기간은 원금 상환 없이 이자만 납부하는 기간입니다. 초기 자금 부담을 줄일 수 있지만, 그만큼 원금 상환이 뒤로 밀려 총 이자는 늘어납니다." },
+  { q: "만기일시 상환은 언제 쓰나요?", a: "전세자금대출처럼 만기에 목돈(전세보증금 반환 등)으로 원금을 갚을 계획이 있을 때 주로 사용합니다. 매달은 이자만 내다가 만기에 원금을 한 번에 상환합니다." },
+  { q: "이 계산기의 이자는 실제와 정확히 같나요?", a: "입력하신 연이율이 계약 기간 내내 동일하다는 가정하에 계산한 추정치입니다. 변동금리 대출은 금리가 바뀔 때마다 상환액도 달라지므로 실제 금액과 차이가 날 수 있습니다." },
+  { q: "DSR은 이 계산기로 확인할 수 있나요?", a: "직접 계산해주지는 않지만, 이 계산기에서 나온 연간 원리금 상환액을 본인의 연소득으로 나누면 대략적인 DSR을 가늠해볼 수 있습니다. 정확한 DSR은 은행 심사 기준에 따라 달라집니다." },
+];
+---
+<CalcShell slug="loan" faq={faq} products={["가계부 다이어리", "재테크 책", "대출 서류 파일"]}>
+  <form id="f" onsubmit="return false">
+    <label for="principal">대출금액 (원)</label>
+    <input type="number" id="principal" value="300000000" min="0" step="1000000" inputmode="numeric" />
+    <p class="hint" id="principalHint"></p>
+    <div class="row">
+      <div>
+        <label for="rate">연이율 (%)</label>
+        <input type="number" id="rate" value="4.0" min="0" step="0.1" />
+      </div>
+      <div>
+        <label for="term">대출기간</label>
+        <input type="number" id="term" value="30" min="1" step="1" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="termUnit">기간 단위</label>
+        <select id="termUnit">
+          <option value="year" selected>년</option>
+          <option value="month">개월</option>
+        </select>
+      </div>
+      <div>
+        <label for="grace">거치기간 (개월)</label>
+        <input type="number" id="grace" value="0" min="0" step="1" />
+      </div>
+    </div>
+    <label>상환방식</label>
+    <div class="seg">
+      <label><input type="radio" name="method" value="equalPayment" checked /><span>원리금균등</span></label>
+      <label><input type="radio" name="method" value="equalPrincipal" /><span>원금균등</span></label>
+      <label><input type="radio" name="method" value="bullet" /><span>만기일시</span></label>
+    </div>
+    <button class="btn" id="go">상환액 계산</button>
+  </form>
+  <div class="result" id="out" hidden>
+    <div id="paymentLabel">월 상환액</div>
+    <div class="big" id="payment"></div>
+    <div class="muted small">총 이자 <strong id="totalInterest"></strong> · 총 상환액 <strong id="totalPayment"></strong></div>
+    <table>
+      <tr><th>상환방식 (동일 조건 비교)</th><th>총 이자</th></tr>
+      <tr><td>원리금균등</td><td id="cmpEqualPayment"></td></tr>
+      <tr><td>원금균등</td><td id="cmpEqualPrincipal"></td></tr>
+      <tr><td>만기일시</td><td id="cmpBullet"></td></tr>
+    </table>
+    <p class="hint">아래는 선택한 상환방식의 전체 스케줄입니다. 표를 좌우·상하로 스크롤해서 확인하세요.</p>
+    <div class="sched">
+      <table id="schedTable"></table>
+    </div>
+  </div>
+
+  <div slot="guide">
+    <h2>대출 상환방식 비교</h2>
+    <table>
+      <tr><th>방식</th><th>특징</th><th>장점</th><th>단점</th></tr>
+      <tr><td>원리금균등</td><td>매달 같은 금액(원금+이자) 상환</td><td>매달 상환액이 일정해 자금 계획이 쉬움</td><td>초반에는 이자 비중이 커서 원금이 천천히 줄어듦</td></tr>
+      <tr><td>원금균등</td><td>매달 같은 원금 + 남은 잔액의 이자</td><td>원금이 빨리 줄어 총 이자가 가장 적음</td><td>초기 상환 부담이 가장 큼</td></tr>
+      <tr><td>만기일시</td><td>매달 이자만 납부, 만기에 원금 일시 상환</td><td>매달 부담이 가장 적음</td><td>총 이자가 가장 많고, 만기에 목돈 필요</td></tr>
+    </table>
+    <h2>원리금균등 상환액 공식</h2>
+    <p>월 상환액 = 대출원금 × 월이율 ÷ (1 − (1 + 월이율)^−상환개월수) 로 계산합니다. 월이율은 연이율을 12로 나눈 값이며, 거치기간이 있다면 거치기간 동안은 이자만 내고 이후 남은 개월 수를 기준으로 이 공식을 적용합니다.</p>
+    <h2>DSR(총부채원리금상환비율) 간단 안내</h2>
+    <p>DSR은 연간 총 대출 원리금 상환액을 연소득으로 나눈 비율입니다. 이 계산기에서 나온 월 상환액에 12를 곱해 연간 상환액을 구한 뒤 본인의 연소득으로 나누면 대략적인 수치를 확인할 수 있습니다. 은행권 주택담보대출은 통상 DSR 40% 안팎을 심사 기준으로 활용하지만, 정확한 산정 방식은 금융기관과 대출 종류에 따라 다릅니다.</p>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
+    const kor = (n) => { n = Math.round(n); if (n >= 100000000) return (n / 100000000).toFixed(n % 100000000 ? 1 : 0) + "억원"; if (n >= 10000) return Math.round(n / 10000).toLocaleString() + "만원"; return n.toLocaleString() + "원"; };
+
+    function calcEqualPayment(P, i, n, g) {
+      const m = Math.max(1, n - g);
+      const payment = i > 0 ? (P * i) / (1 - Math.pow(1 + i, -m)) : P / m;
+      const rows = []; let balance = P, totalInterest = 0;
+      for (let t = 1; t <= g; t++) { const interest = balance * i; rows.push({ r: t, principal: 0, interest, payment: interest, balance }); totalInterest += interest; }
+      for (let t = 1; t <= m; t++) { const interest = balance * i; let princ = t === m ? balance : payment - interest; const pay = princ + interest; balance = Math.max(0, balance - princ); rows.push({ r: g + t, principal: princ, interest, payment: pay, balance }); totalInterest += interest; }
+      return { rows, totalInterest, totalPayment: P + totalInterest, payment };
+    }
+    function calcEqualPrincipal(P, i, n, g) {
+      const m = Math.max(1, n - g);
+      const princPerMonth = P / m;
+      const rows = []; let balance = P, totalInterest = 0, firstPayment = 0, lastPayment = 0;
+      for (let t = 1; t <= g; t++) { const interest = balance * i; rows.push({ r: t, principal: 0, interest, payment: interest, balance }); totalInterest += interest; }
+      for (let t = 1; t <= m; t++) { const interest = balance * i; const princ = t === m ? balance : princPerMonth; const pay = princ + interest; if (t === 1) firstPayment = pay; if (t === m) lastPayment = pay; balance = Math.max(0, balance - princ); rows.push({ r: g + t, principal: princ, interest, payment: pay, balance }); totalInterest += interest; }
+      return { rows, totalInterest, totalPayment: P + totalInterest, firstPayment, lastPayment };
+    }
+    function calcBullet(P, i, n) {
+      const rows = []; let totalInterest = 0;
+      for (let t = 1; t <= n; t++) { const interest = P * i; const princ = t === n ? P : 0; const pay = princ + interest; rows.push({ r: t, principal: princ, interest, payment: pay, balance: t === n ? 0 : P }); totalInterest += interest; }
+      return { rows, totalInterest, totalPayment: P + totalInterest, monthlyInterest: P * i };
+    }
+
+    function run() {
+      const P = +$("principal").value || 0;
+      $("principalHint").textContent = kor(P);
+      const rate = +$("rate").value || 0;
+      const i = rate / 100 / 12;
+      const termVal = +$("term").value || 0;
+      const unit = $("termUnit").value;
+      const n = Math.max(1, unit === "year" ? Math.round(termVal * 12) : Math.round(termVal));
+      const g = Math.min(n - 1, Math.max(0, +$("grace").value || 0));
+      const method = document.querySelector('input[name=method]:checked').value;
+
+      let result, label, paymentText;
+      if (method === "equalPayment") {
+        result = calcEqualPayment(P, i, n, g);
+        label = "월 상환액 (원리금 동일)";
+        paymentText = won(result.payment);
+      } else if (method === "equalPrincipal") {
+        result = calcEqualPrincipal(P, i, n, g);
+        label = "월 상환액 (첫 달 → 마지막 달)";
+        paymentText = won(result.firstPayment) + " → " + won(result.lastPayment);
+      } else {
+        result = calcBullet(P, i, n);
+        label = "월 이자 납입액 (만기에 원금 일시상환)";
+        paymentText = won(result.monthlyInterest);
+      }
+
+      $("paymentLabel").textContent = label;
+      $("payment").textContent = paymentText;
+      $("totalInterest").textContent = won(result.totalInterest);
+      $("totalPayment").textContent = won(result.totalPayment);
+
+      $("cmpEqualPayment").textContent = won(calcEqualPayment(P, i, n, g).totalInterest);
+      $("cmpEqualPrincipal").textContent = won(calcEqualPrincipal(P, i, n, g).totalInterest);
+      $("cmpBullet").textContent = won(calcBullet(P, i, n).totalInterest);
+
+      const html = ["<tr><th>회차</th><th>납입원금</th><th>이자</th><th>월 납입액</th><th>잔액</th></tr>"];
+      for (const row of result.rows) html.push(`<tr><td>${row.r}</td><td>${won(row.principal)}</td><td>${won(row.interest)}</td><td>${won(row.payment)}</td><td>${won(row.balance)}</td></tr>`);
+      $("schedTable").innerHTML = html.join("");
+
+      $("out").hidden = false;
+    }
+    $("go").addEventListener("click", run);
+    $("principal").addEventListener("input", () => { $("principalHint").textContent = kor(+$("principal").value || 0); });
+    run();
+  </script>
+</CalcShell>

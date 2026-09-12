@@ -1,0 +1,44 @@
+name: Daily post generation
+on:
+  schedule:
+    - cron: "30 0 * * *"   # 매일 09:30 KST
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "생성할 글 수"
+        default: "1"
+permissions:
+  contents: write
+  actions: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Generate post with Claude
+        run: npm run generate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
+          POSTS_PER_RUN: ${{ github.event.inputs.count || '1' }}
+      - name: Commit new post
+        id: commit
+        run: |
+          git config user.name "money-calc-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "post: $(date -u +%Y-%m-%d) 자동 발행"
+            git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Trigger deploy
+        if: steps.commit.outputs.changed == 'true'
+        run: gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

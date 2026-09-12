@@ -1,0 +1,85 @@
+---
+import { SITE, CALCS } from "../lib/site";
+import { ADSENSE_CLIENT, GA_ID } from "../lib/monetize";
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string[];
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  type?: "website" | "article";
+  publishedTime?: string;
+}
+const { title, description, keywords = [], jsonLd, type = "website", publishedTime } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const fullTitle = title === SITE.name ? `${SITE.name} | ${SITE.tagline}` : `${title} | ${SITE.name}`;
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+ld.push({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: Astro.site?.toString(),
+});
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content={SITE.locale} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    <meta name="twitter:card" content="summary" />
+    <meta name="naver-site-verification" content={import.meta.env.PUBLIC_NAVER_VERIFY || ""} />
+    <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_VERIFY || ""} />
+    {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    {ADSENSE_CLIENT && (
+      <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`} crossorigin="anonymous"></script>
+    )}
+    {GA_ID && (
+      <>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+        <script set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','${GA_ID}');`} />
+      </>
+    )}
+    <link rel="stylesheet" href="/global.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="/">💸 {SITE.name}</a>
+        <nav class="nav">
+          {CALCS.slice(0, 5).map((c) => <a href={`/calc/${c.slug}`}>{c.short}</a>)}
+          <a href="/calc">전체</a>
+          <a href="/blog">블로그</a>
+        </nav>
+      </div>
+    </header>
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          <a href="/about">소개</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/rss.xml">RSS</a>
+        </p>
+        <p class="muted">
+          본 사이트의 계산 결과는 참고용이며 법적 효력이 없습니다. 실제 금액은 기관·회사 규정에 따라 달라질 수 있습니다.
+          이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받을 수 있습니다.
+        </p>
+        <p class="muted">© {new Date().getFullYear()} {SITE.name}</p>
+      </div>
+    </footer>
+  </body>
+</html>
