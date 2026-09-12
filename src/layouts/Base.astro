@@ -44,6 +44,7 @@ ld.push({
     <meta name="naver-site-verification" content={import.meta.env.PUBLIC_NAVER_VERIFY || ""} />
     <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_VERIFY || ""} />
     {ld.map((o) => <script type="application/ld+json" set:html={JSON.stringify(o)} />)}
+    {ADSENSE_CLIENT && <meta name="google-adsense-account" content={ADSENSE_CLIENT} />}
     {ADSENSE_CLIENT && (
       <script async src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`} crossorigin="anonymous"></script>
     )}
