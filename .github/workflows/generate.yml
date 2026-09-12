@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       count:
-        description: "생성할 글 수"
-        default: "1"
+        description: "생성할 글 수 (비우면 저장소 변수 POSTS_PER_RUN 적용)"
+        required: false
 permissions:
   contents: write
   actions: write
