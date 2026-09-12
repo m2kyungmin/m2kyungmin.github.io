@@ -1,0 +1,131 @@
+---
+import CalcShell from "../../components/CalcShell.astro";
+const faq = [
+  { q: "BMI는 어떻게 계산하나요?", a: "체질량지수(BMI) = 몸무게(kg) ÷ 키(m)의 제곱 입니다. 예를 들어 키 170cm, 몸무게 65kg이라면 65 ÷ 1.7² ≈ 22.5 입니다." },
+  { q: "BMI가 정상이면 건강한 건가요?", a: "BMI는 키와 몸무게만으로 계산하는 간단한 지표라 근육량, 체지방률, 체형 차이를 반영하지 못합니다. 운동을 많이 해 근육량이 많은 사람은 BMI가 높게 나와도 체지방률은 낮을 수 있습니다." },
+  { q: "한국 기준과 WHO(세계보건기구) 기준이 다른가요?", a: "네, 다릅니다. WHO 기준은 25 이상부터 비만으로 분류하지만, 대한비만학회 등 아시아 기준은 23 이상을 '비만 전 단계(과체중)'로 보아 더 엄격하게 적용합니다. 이 계산기는 대한비만학회 기준을 사용합니다." },
+  { q: "기초대사량(BMR)은 왜 나오나요?", a: "나이와 성별을 입력하면 Mifflin-St Jeor 공식으로 하루 동안 생명 유지에 필요한 최소 열량(기초대사량)을 함께 보여드립니다. 다이어트나 식단 계획을 세울 때 참고할 수 있습니다." },
+  { q: "정상 체중까지 얼마나 감량/증량해야 하나요?", a: "정상 체중 범위(BMI 18.5~22.9)에 해당하는 몸무게 구간을 계산해, 현재 체중과의 차이를 감량 또는 증량 필요량으로 보여드립니다." },
+];
+---
+<CalcShell slug="bmi" faq={faq} products={["체중계", "폼롤러", "운동 매트"]}>
+  <form id="f" onsubmit="return false">
+    <div class="row">
+      <div>
+        <label for="height">키 (cm)</label>
+        <input type="number" id="height" value="170" min="50" max="250" step="0.1" />
+      </div>
+      <div>
+        <label for="weight">몸무게 (kg)</label>
+        <input type="number" id="weight" value="65" min="10" max="300" step="0.1" />
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label>성별</label>
+        <div class="seg">
+          <label><input type="radio" name="gender" value="male" checked /><span>남성</span></label>
+          <label><input type="radio" name="gender" value="female" /><span>여성</span></label>
+        </div>
+      </div>
+      <div>
+        <label for="age">나이 (선택, BMR 계산용)</label>
+        <input type="number" id="age" value="30" min="0" max="120" />
+      </div>
+    </div>
+    <button class="btn" id="go">BMI 계산</button>
+  </form>
+
+  <div class="result" id="out" hidden>
+    <div>내 BMI</div>
+    <div class="big" id="bmiVal"></div>
+    <div class="muted small" id="category"></div>
+    <div style="position:relative;height:22px;border-radius:6px;overflow:hidden;display:flex;margin:16px 0 26px">
+      <div style="width:14%;background:#93c5fd"></div>
+      <div style="width:18%;background:#86efac"></div>
+      <div style="width:8%;background:#fde047"></div>
+      <div style="width:20%;background:#fdba74"></div>
+      <div style="width:20%;background:#fca5a5"></div>
+      <div style="width:20%;background:#f87171"></div>
+      <div id="marker" style="position:absolute;top:-4px;width:4px;height:30px;background:#1a1d24;border-radius:2px;left:0%"></div>
+    </div>
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td>정상 체중 범위</td><td id="normalRange"></td></tr>
+      <tr><td id="adjustLabel">체중 조절 필요량</td><td id="adjustVal"></td></tr>
+      <tr><td>기초대사량 (BMR)</td><td id="bmr"></td></tr>
+    </table>
+    <p class="hint">기초대사량은 나이를 입력했을 때 Mifflin-St Jeor 공식으로 계산됩니다.</p>
+  </div>
+
+  <div slot="guide">
+    <h2>BMI 계산 공식</h2>
+    <p>체질량지수(BMI) = 몸무게(kg) ÷ 키(m)². 키와 몸무게만으로 계산하는 간단한 비만도 지표입니다.</p>
+    <h2>한국(대한비만학회) 기준 vs WHO 기준</h2>
+    <table>
+      <tr><th>BMI 범위</th><th>한국(대한비만학회) 기준</th><th>WHO(세계보건기구) 기준</th></tr>
+      <tr><td>18.5 미만</td><td>저체중</td><td>저체중</td></tr>
+      <tr><td>18.5 ~ 22.9</td><td>정상</td><td>정상</td></tr>
+      <tr><td>23 ~ 24.9</td><td>비만 전 단계(과체중)</td><td>과체중</td></tr>
+      <tr><td>25 ~ 29.9</td><td>1단계 비만</td><td>비만(1단계)</td></tr>
+      <tr><td>30 ~ 34.9</td><td>2단계 비만</td><td>비만(2단계)</td></tr>
+      <tr><td>35 이상</td><td>3단계 비만(고도비만)</td><td>비만(3단계)</td></tr>
+    </table>
+    <h2>BMI의 한계</h2>
+    <p>BMI는 체지방과 근육량을 구분하지 못합니다. 운동선수처럼 근육량이 많은 사람은 BMI가 높아도 체지방률이 낮을 수 있고, 반대로 근육량이 적은 사람은 BMI가 정상이어도 체지방률이 높을 수 있습니다. 정확한 체성분은 인바디 등 체성분 분석 기기로 확인하는 것이 좋습니다.</p>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function run() {
+      const h = +$("height").value || 0;
+      const w = +$("weight").value || 0;
+      const gender = document.querySelector('input[name=gender]:checked').value;
+      const age = +$("age").value || 0;
+      const hm = h / 100;
+      const bmi = hm > 0 ? w / (hm * hm) : 0;
+
+      let category, color;
+      if (bmi < 18.5) { category = "저체중"; color = "#3b82f6"; }
+      else if (bmi < 23) { category = "정상"; color = "#16a34a"; }
+      else if (bmi < 25) { category = "비만 전 단계 (과체중)"; color = "#ca8a04"; }
+      else if (bmi < 30) { category = "1단계 비만"; color = "#ea580c"; }
+      else if (bmi < 35) { category = "2단계 비만"; color = "#dc2626"; }
+      else { category = "3단계 비만 (고도비만)"; color = "#991b1b"; }
+
+      $("bmiVal").textContent = bmi.toFixed(1);
+      $("bmiVal").style.color = color;
+      $("category").textContent = category;
+
+      const pct = Math.min(100, Math.max(0, ((Math.min(40, Math.max(15, bmi)) - 15) / 25) * 100));
+      $("marker").style.left = pct + "%";
+
+      const minNormal = 18.5 * hm * hm;
+      const maxNormal = 22.9 * hm * hm;
+      $("normalRange").textContent = `${minNormal.toFixed(1)}kg ~ ${maxNormal.toFixed(1)}kg`;
+
+      if (w > maxNormal) {
+        $("adjustLabel").textContent = "정상 체중까지 감량 필요량";
+        $("adjustVal").textContent = `약 ${(w - maxNormal).toFixed(1)}kg 감량`;
+      } else if (w < minNormal) {
+        $("adjustLabel").textContent = "정상 체중까지 증량 필요량";
+        $("adjustVal").textContent = `약 ${(minNormal - w).toFixed(1)}kg 증량`;
+      } else {
+        $("adjustLabel").textContent = "정상 체중까지 필요량";
+        $("adjustVal").textContent = "이미 정상 범위입니다";
+      }
+
+      if (age > 0) {
+        const bmr = gender === "male" ? 10 * w + 6.25 * h - 5 * age + 5 : 10 * w + 6.25 * h - 5 * age - 161;
+        $("bmr").textContent = `약 ${Math.round(bmr).toLocaleString("ko-KR")}kcal / 일`;
+      } else {
+        $("bmr").textContent = "나이를 입력하면 계산됩니다";
+      }
+
+      $("out").hidden = false;
+    }
+    $("go").addEventListener("click", run);
+    run();
+  </script>
+</CalcShell>
