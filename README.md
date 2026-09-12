@@ -3,7 +3,7 @@
 한국어 생활·금융 계산기 사이트 + Claude가 매일 글을 자동 발행하는 블로그.
 GitHub Pages에 무료로 자동 배포되며, 광고(애드센스/애드핏)와 제휴(쿠팡 파트너스)로 수익을 냅니다.
 
-- 사이트: https://m2kyungmin.github.io
+- 사이트: https://mintech.ai.kr (구 주소 https://m2kyungmin.github.io 는 자동 리다이렉트)
 - 스택: Astro 7 (정적 빌드) · GitHub Actions · Anthropic SDK
 
 ## 어떻게 돈이 되나
