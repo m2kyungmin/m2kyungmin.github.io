@@ -24,7 +24,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           CLAUDE_MODEL: ${{ vars.CLAUDE_MODEL }}
-          POSTS_PER_RUN: ${{ github.event.inputs.count || '1' }}
+          POSTS_PER_RUN: ${{ github.event.inputs.count || vars.POSTS_PER_RUN || '1' }}
       - name: Commit new post
         id: commit
         run: |

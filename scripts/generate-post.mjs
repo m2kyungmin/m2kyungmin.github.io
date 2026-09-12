@@ -13,7 +13,11 @@ const BLOG_DIR = path.join(ROOT, "src/content/blog");
 const TOPICS_FILE = path.join(here, "topics.json");
 const USED_FILE = path.join(here, "used-topics.json");
 const MODEL = process.env.CLAUDE_MODEL || "claude-opus-5";
-const POSTS_PER_RUN = Number(process.env.POSTS_PER_RUN || 1);
+// 초기 부스트: 글이 BOOST_UNTIL_POSTS편에 도달하면 하루 1편으로 자동 복귀
+const BOOST_UNTIL_POSTS = Number(process.env.BOOST_UNTIL_POSTS || 40);
+const existingPosts = fs.existsSync(BLOG_DIR) ? fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md")).length : 0;
+const POSTS_PER_RUN = existingPosts >= BOOST_UNTIL_POSTS ? 1 : Number(process.env.POSTS_PER_RUN || 1);
+console.log(`현재 글 ${existingPosts}편 · 이번 실행 ${POSTS_PER_RUN}편 생성`);
 
 if (!process.env.ANTHROPIC_API_KEY) {
   console.log("ANTHROPIC_API_KEY 미설정: 글 생성을 건너뜁니다.");
