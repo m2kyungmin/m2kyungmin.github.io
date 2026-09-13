@@ -12,9 +12,13 @@ export type Offer = {
 
 export const LINKPRICE_ID = "A100707690";
 
+const lp = (m: string) => `https://click.linkprice.com/click.php?m=${m}&a=${LINKPRICE_ID}&l=0000`;
+
 export const OFFERS: Offer[] = [
-  // 예시 (승인 후 값 채우기):
-  // { id: "card-a", name: "OO카드 신규 발급", desc: "연회비 1만원, 첫 달 최대 5만원 캐시백", cta: "카드 혜택 보기", url: "https://click.linkprice.com/click.php?m=...&a=A100707690&l=...", calcs: ["salary", "hourly"] },
+  { id: "mycredit1", name: "NICE지키미 신용점수 조회", desc: "NICE평가정보의 신용점수·신용정보 조회 서비스. 대출 신청 전 내 점수를 먼저 확인해 보세요.", cta: "신용점수 확인하기", url: lp("mycredit1"), calcs: ["loan", "rent"] },
+  { id: "allcredit", name: "올크레딧 신용점수 조회", desc: "KCB(코리아크레딧뷰로) 기준 신용점수 조회·관리 서비스. 은행마다 다른 기준을 함께 확인할 때 유용합니다.", cta: "KCB 점수 확인하기", url: lp("allcredit"), calcs: ["loan", "rent"] },
+  { id: "barobill", name: "바로빌 전자세금계산서", desc: "사업자·프리랜서용 전자세금계산서 발급·관리 서비스. 부가세 신고 자료를 한곳에서 정리할 수 있습니다.", cta: "서비스 알아보기", url: lp("barobill"), calcs: ["vat"] },
+  { id: "signgate", name: "한국정보인증 공동인증서", desc: "세금계산서 발급과 홈택스 신고에 필요한 사업자용 공동인증서(범용) 발급.", cta: "인증서 발급 안내", url: lp("signgate"), calcs: ["vat"] },
 ];
 
 export const offersFor = (calc?: string) => (calc ? OFFERS.filter((o) => o.url && o.calcs.includes(calc)) : []);
