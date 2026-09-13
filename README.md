@@ -19,7 +19,7 @@ GitHub Pages에 무료로 자동 배포되며, 광고(애드센스/애드핏)와
 ## 자동으로 돌아가는 것
 
 1. **배포**: `main`에 푸시되면 `.github/workflows/deploy.yml`이 빌드해 GitHub Pages에 올립니다.
-2. **글 발행**: 매일 09:30 KST에 `.github/workflows/generate.yml`이 `scripts/generate-post.mjs`를 실행해 Claude로 글 1편을 생성하고 커밋한 뒤 배포를 트리거합니다.
+2. **글 발행**: 매일 09:30 KST에 Claude Code 클라우드 루틴("머니계산기 매일 글 자동 발행", https://claude.ai/code/routines)이 저장소를 받아 글을 직접 써서 main에 푸시합니다. 구독 사용량으로 처리되어 API 비용이 들지 않습니다. 글이 40편 미만이면 하루 2편, 이후 1편입니다. `.github/workflows/generate.yml`(API 키 사용)은 수동 실행용 예비 수단입니다.
    - 주제는 `scripts/topics.json`에서 계산기별로 균형 있게 꺼내 쓰고, `scripts/used-topics.json`에 기록합니다.
    - 주제가 소진되면 Claude가 새 주제를 만들어 `topics.json`에 채워 넣습니다.
 3. **SEO**: sitemap, RSS, robots.txt, ads.txt, Open Graph, JSON-LD(WebApplication/FAQ/Article)가 자동 생성됩니다.

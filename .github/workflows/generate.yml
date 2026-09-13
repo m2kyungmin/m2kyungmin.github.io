@@ -1,8 +1,8 @@
 # 매일 Claude로 글 1편을 생성해 커밋하고 배포를 트리거합니다.
 name: Daily post generation
+# 매일 자동 발행은 Claude Code 클라우드 루틴(구독 사용량)이 담당합니다: https://claude.ai/code/routines
+# 이 워크플로는 API 키를 쓰는 예비 수단으로, 수동 실행(workflow_dispatch)만 남겨 둡니다.
 on:
-  schedule:
-    - cron: "30 0 * * *"   # 매일 09:30 KST
   workflow_dispatch:
     inputs:
       count:
