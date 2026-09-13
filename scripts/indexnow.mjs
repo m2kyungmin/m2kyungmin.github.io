@@ -46,10 +46,12 @@ else {
 urls = [...new Set(urls)].filter((u) => u.startsWith(site)).slice(0, 10000);
 if (urls.length === 0) { console.log("제출할 URL 없음"); process.exit(0); }
 
-const res = await fetch("https://api.indexnow.org/indexnow", {
-  method: "POST",
-  headers: { "Content-Type": "application/json; charset=utf-8" },
-  body: JSON.stringify({ host, key, keyLocation: `${site}/${key}.txt`, urlList: urls }),
-});
-console.log(`IndexNow 제출 ${urls.length}개 URL → HTTP ${res.status}`);
-if (res.status >= 400) { console.error(await res.text()); process.exit(1); }
+// 배포 직후에는 키 파일이 아직 CDN에 전파되지 않아 403이 날 수 있어 재시도합니다.
+const body = JSON.stringify({ host, key, keyLocation: `${site}/${key}.txt`, urlList: urls });
+for (let attempt = 1; attempt <= 6; attempt++) {
+  const res = await fetch("https://api.indexnow.org/indexnow", { method: "POST", headers: { "Content-Type": "application/json; charset=utf-8" }, body });
+  console.log(`IndexNow 제출 ${urls.length}개 URL → HTTP ${res.status} (시도 ${attempt})`);
+  if (res.status < 400) process.exit(0);
+  if (attempt === 6) { console.error(await res.text()); process.exit(1); }
+  await new Promise((r) => setTimeout(r, 60000));
+}

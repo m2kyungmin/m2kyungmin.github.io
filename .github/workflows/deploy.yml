@@ -58,6 +58,6 @@ jobs:
           fi
           echo "changed files: $(wc -l < changed.txt 2>/dev/null || echo 0)"
       - name: Submit to IndexNow (Naver, Bing)
-        run: sleep 60 && node scripts/indexnow.mjs $mode
+        run: sleep 90 && node scripts/indexnow.mjs $mode
         env:
           SITE_URL: ${{ vars.SITE_URL }}
