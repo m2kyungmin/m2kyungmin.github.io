@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import Offers from "../../components/Offers.astro";
 import { installmentInterest, depositInterest, afterTax } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
 import { getCollection } from "astro:content";
@@ -94,6 +95,7 @@ const jsonLd = [
   </div>
   <p class="card">🧮 금리·과세 구분을 바꿔서 내 조건으로 계산하려면 → <a href={`/calc/compound?monthly=${monthlyWon}`}><strong>예적금·복리 계산기</strong></a></p>
 
+  <Offers calc="compound" />
   <section class="prose">
     <h2>기간·금리별 매달 {num(monthlyMan)}만원 적금 세후 만기 수령액</h2>
     <p>이자소득세 15.4%를 뗀 세후 금액입니다. 정기적금은 매월 납입액마다 남은 기간만큼만 이자가 붙는 단리 방식으로 계산합니다.</p>

@@ -1,0 +1,17 @@
+---
+import { offersFor } from "../lib/offers";
+interface Props { calc?: string; title?: string }
+const { calc, title = "함께 확인해 볼 금융 상품" } = Astro.props;
+const offers = offersFor(calc);
+---
+{offers.length > 0 && (
+  <aside class="card offers">
+    <h3>💳 {title}</h3>
+    <div class="grid">
+      {offers.map((o) => (
+        <a class="tile" href={o.url} target="_blank" rel="nofollow sponsored noopener"><strong>{o.name}</strong><small>{o.desc}</small><span class="btn small-btn">{o.cta}</span></a>
+      ))}
+    </div>
+    <p class="muted small">제휴 링크를 통해 신청 시 사이트에 소정의 수수료가 지급될 수 있으며, 이용자에게 추가 비용은 없습니다. 상품 조건은 반드시 해당 금융회사 안내를 확인하세요.</p>
+  </aside>
+)}

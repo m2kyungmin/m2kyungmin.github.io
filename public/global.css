@@ -37,3 +37,4 @@ details{border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:
 .post h2{margin-top:1.4em}.post img{max-width:100%}.post blockquote{border-left:4px solid var(--line);margin:0;padding-left:14px;color:var(--muted)}
 .hero{text-align:center;padding:32px 0 8px}.hero h1{font-size:2rem}.hero p{font-size:1.05rem}
 .cat{margin-top:28px}
+.offers .tile{gap:8px}.small-btn{margin-top:auto;padding:8px 12px;font-size:.9rem;width:auto;text-align:center}

@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import AdSlot from "./AdSlot.astro";
 import Coupang from "./Coupang.astro";
+import Offers from "./Offers.astro";
 import { CALCS, getCalc } from "../lib/site";
 import { getCollection } from "astro:content";
 
@@ -45,6 +46,7 @@ if (faq.length) {
   <section class="card calc">
     <slot />
   </section>
+  <Offers calc={slug} />
   <section class="prose">
     <slot name="guide" />
   </section>

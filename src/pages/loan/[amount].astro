@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import Offers from "../../components/Offers.astro";
 import { equalPayment, equalPrincipal, bulletTotalInterest } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
 import { getCollection } from "astro:content";
@@ -86,6 +87,7 @@ const jsonLd = [
   </div>
   <p class="card">🧮 거치기간·상환방식을 바꿔서 내 조건으로 계산하려면 → <a href={`/calc/loan?amount=${amount}`}><strong>대출 이자 계산기</strong></a></p>
 
+  <Offers calc="loan" />
   <section class="prose">
     <h2>상환방식별 비교 (연 {RATE_DEFAULT}%, {methodTerm}년 기준)</h2>
     <p>같은 대출금액·금리·기간이라도 상환방식에 따라 총 이자가 크게 달라집니다.</p>

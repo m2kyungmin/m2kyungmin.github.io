@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import Offers from "../../components/Offers.astro";
 import { getCollection, render } from "astro:content";
 import { getCalc } from "../../lib/site";
 
@@ -32,6 +33,7 @@ const jsonLd = {
     <AdSlot position="top" />
     {calc && <p class="card">🧮 직접 계산해 보세요 → <a href={`/calc/${calc.slug}`}><strong>{calc.title}</strong></a></p>}
     <Content />
+    <Offers calc={post.data.calc} />
     <AdSlot position="bottom" />
     <Coupang keywords={post.data.products} />
     {calc && <p class="card">🧮 <a href={`/calc/${calc.slug}`}><strong>{calc.title}</strong></a>로 내 경우를 바로 계산해 보세요.</p>}

@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import Offers from "../../components/Offers.astro";
 import { calcAnnual, YEAR, RATES } from "../../lib/salary";
 import { won, kor, num } from "../../lib/format";
 import { getCollection } from "astro:content";
@@ -60,6 +61,7 @@ const jsonLd = [
   </div>
   <p class="card">🧮 비과세액·부양가족·자녀 수를 바꿔서 내 조건으로 계산하려면 → <a href={`/calc/salary?amount=${annual}`}><strong>연봉 실수령액 계산기</strong></a></p>
 
+  <Offers calc="salary" />
   <section class="prose">
     <h2>부양가족 수에 따른 연봉 {kor(annual)} 실수령액</h2>
     <p>기본공제 대상 가족이 한 명 늘어날 때마다 과세표준이 150만원 줄어 소득세가 낮아집니다. 8세 이상 20세 이하 자녀가 있으면 자녀세액공제가 추가됩니다.</p>
