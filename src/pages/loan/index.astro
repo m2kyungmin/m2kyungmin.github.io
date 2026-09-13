@@ -1,0 +1,36 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { equalPayment } from "../../lib/finance";
+import { won, kor } from "../../lib/format";
+import { AMOUNTS } from "./[amount].astro";
+
+const YEAR = 2026;
+const RATE = 4.0;
+const rows = AMOUNTS.map((a) => {
+  const amount = a * 10000;
+  const term = amount <= 100000000 ? 10 : 30;
+  return { a, term, r: equalPayment(amount, RATE, term * 12) };
+});
+const groups = [
+  { label: "대출 1,000만 ~ 9,000만원 (10년, 연 4%)", rows: rows.filter((x) => x.a < 10000) },
+  { label: "대출 1억 ~ 4억5,000만원 (30년, 연 4%)", rows: rows.filter((x) => x.a >= 10000 && x.a < 50000) },
+  { label: "대출 5억 ~ 10억원 (30년, 연 4%)", rows: rows.filter((x) => x.a >= 50000) },
+];
+---
+<Base title={`대출 금액별 이자 표 (${YEAR}년, 연 4%)`} description={`대출 1,000만원부터 10억원까지 연 4% 원리금균등 기준 월 상환액과 총 이자를 정리한 표. 대출금액을 눌러 금리·기간·상환방식별 비교를 확인하세요.`} keywords={["대출 이자 계산기", "원리금균등 계산", "대출 상환액 표", "주택담보대출 이자"]}>
+  <nav class="crumbs"><a href="/">홈</a> › 대출 금액별 이자</nav>
+  <h1>대출 금액별 이자 표 ({YEAR}년 기준)</h1>
+  <p class="lead">연 {RATE}% 금리, 1억원 이하는 10년, 1억원 초과는 30년 원리금균등 상환 기준 추정치입니다. 대출금액을 누르면 금리·기간별 비교와 상환방식별 총 이자를 볼 수 있고, <a href="/calc/loan">계산기</a>에서 내 조건으로 직접 계산할 수도 있습니다.</p>
+  <AdSlot position="top" />
+  {groups.map((g) => (
+    <section class="prose">
+      <h2>{g.label}</h2>
+      <table>
+        <tr><th>대출금액</th><th>기간</th><th>월 상환액</th><th>총 이자</th></tr>
+        {g.rows.map(({ a, term, r }) => <tr><td><a href={`/loan/${a}`}>{kor(a * 10000)}</a></td><td>{term}년</td><td><strong>{won(r.monthly)}</strong></td><td>{won(r.totalInterest)}</td></tr>)}
+      </table>
+    </section>
+  ))}
+  <AdSlot position="bottom" />
+</Base>

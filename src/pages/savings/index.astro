@@ -1,0 +1,40 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { installmentInterest, afterTax } from "../../lib/finance";
+import { won, num } from "../../lib/format";
+import { MONTHLY } from "./[monthly].astro";
+
+const YEAR = 2026;
+const RATE = 3.5;
+const PERIODS = [12, 36, 60, 120];
+const rows = MONTHLY.map((m) => {
+  const monthlyWon = m * 10000;
+  const cols = PERIODS.map((months) => {
+    const interest = installmentInterest(monthlyWon, RATE, months);
+    const { net } = afterTax(interest, 0.154);
+    return monthlyWon * months + net;
+  });
+  return { m, cols };
+});
+---
+<Base title={`월 적금액별 만기 수령액 표 (${YEAR}년, 연 3.5%)`} description={`매달 5만원부터 200만원까지 연 3.5% 정기적금 기준 1년·3년·5년·10년 세후 만기 수령액을 정리한 표. 적금액을 눌러 금리별 상세 비교를 확인하세요.`} keywords={["적금 만기 수령액", "적금 이자 계산기", "정기적금 계산", "적금 만기금액표"]}>
+  <nav class="crumbs"><a href="/">홈</a> › 월 적금액별 만기 수령액</nav>
+  <h1>월 적금액별 만기 수령액 표 ({YEAR}년 기준)</h1>
+  <p class="lead">연 {RATE}% 정기적금, 이자소득세 15.4% 공제 기준 세후 만기 수령액 추정치입니다. 적금액을 누르면 기간·금리별 상세 비교를 볼 수 있고, <a href="/calc/compound">계산기</a>에서 내 조건으로 직접 계산할 수도 있습니다.</p>
+  <AdSlot position="top" />
+  <section class="prose">
+    <div class="sched">
+      <table>
+        <tr><th>월 납입액</th>{PERIODS.map((p) => <th>{p / 12}년 ({p}개월)</th>)}</tr>
+        {rows.map(({ m, cols }) => (
+          <tr>
+            <td><a href={`/savings/${m}`}><strong>{num(m)}만원</strong></a></td>
+            {cols.map((v) => <td>{won(v)}</td>)}
+          </tr>
+        ))}
+      </table>
+    </div>
+  </section>
+  <AdSlot position="bottom" />
+</Base>

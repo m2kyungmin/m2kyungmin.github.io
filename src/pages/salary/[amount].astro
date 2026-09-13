@@ -1,0 +1,107 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import Coupang from "../../components/Coupang.astro";
+import { calcAnnual, YEAR, RATES } from "../../lib/salary";
+import { won, kor, num } from "../../lib/format";
+import { getCollection } from "astro:content";
+
+// 연봉 2,000만 ~ 1억5,000만원, 100만원 단위 (URL은 만원 단위 숫자)
+export const AMOUNTS = Array.from({ length: 131 }, (_, i) => 2000 + i * 100);
+export async function getStaticPaths() {
+  return AMOUNTS.map((a) => ({ params: { amount: String(a) } }));
+}
+const amountMan = Number(Astro.params.amount);
+const annual = amountMan * 10000;
+const base = calcAnnual(annual);
+const title = `연봉 ${kor(annual)} 실수령액 (${YEAR}년 기준) 월 ${kor(base.net)}`;
+const description = `연봉 ${kor(annual)}의 ${YEAR}년 월 실수령액은 약 ${won(base.net)}입니다. 4대보험·소득세 공제 내역, 부양가족 수별 실수령액, 퇴직금 포함 연봉일 때 금액까지 표로 정리했습니다.`;
+const idx = AMOUNTS.indexOf(amountMan);
+const neighbors = AMOUNTS.slice(Math.max(0, idx - 5), idx).concat(AMOUNTS.slice(idx + 1, idx + 6));
+const families = [1, 2, 3, 4].map((f) => ({ f, r: calcAnnual(annual, { family: f }) }));
+const children = [1, 2].map((c) => ({ c, r: calcAnnual(annual, { family: 1 + c, children: c }) }));
+const incl = calcAnnual(annual, { div: 13 });
+const noTaxfree = calcAnnual(annual, { taxfree: 0 });
+const posts = (await getCollection("blog")).filter((p) => p.data.calc === "salary").sort((a, b) => +b.data.pubDate - +a.data.pubDate).slice(0, 4);
+const faq = [
+  { q: `연봉 ${kor(annual)}이면 월급은 얼마인가요?`, a: `세전 월급은 ${won(annual / 12)}이고, 4대보험과 소득세를 뺀 실수령액은 1인 가구 기준 약 ${won(base.net)}입니다.` },
+  { q: `연봉 ${kor(annual)}에서 세금과 보험료는 한 달에 얼마나 빠지나요?`, a: `4대보험료 약 ${won(base.np + base.hi + base.ltc + base.ei)}, 소득세와 지방소득세 약 ${won(base.tax + base.ltax)}로 합계 약 ${won(base.grossMonthly - base.net)}입니다.` },
+  { q: "회사 급여명세서와 금액이 다른 이유는 무엇인가요?", a: "실제 원천징수는 국세청 간이세액표와 회사의 비과세 항목 처리에 따라 달라집니다. 이 페이지는 월 비과세 20만원, 부양가족 본인 1인 기준 추정치입니다." },
+];
+const jsonLd = [
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "홈", item: new URL("/", Astro.site).toString() },
+    { "@type": "ListItem", position: 2, name: "연봉별 실수령액", item: new URL("/salary", Astro.site).toString() },
+    { "@type": "ListItem", position: 3, name: `연봉 ${kor(annual)}`, item: new URL(`/salary/${amountMan}`, Astro.site).toString() },
+  ] },
+];
+---
+<Base title={title} description={description} keywords={[`연봉 ${amountMan} 실수령액`, `연봉 ${kor(annual)} 실수령액`, `연봉 ${amountMan}만원 월급`, "세후 연봉"]} jsonLd={jsonLd}>
+  <nav class="crumbs"><a href="/">홈</a> › <a href="/salary">연봉별 실수령액</a> › 연봉 {kor(annual)}</nav>
+  <h1>연봉 {kor(annual)} 실수령액 ({YEAR}년 기준)</h1>
+  <p class="lead">연봉 {kor(annual)}의 월 실수령액은 <strong>약 {won(base.net)}</strong>입니다. 세전 월급 {won(base.grossMonthly)}에서 4대보험료와 소득세 {won(base.grossMonthly - base.net)}이 공제된 금액입니다. (월 비과세 20만원, 부양가족 본인 1인 기준)</p>
+  <AdSlot position="top" />
+  <div class="result">
+    <div>월 예상 실수령액</div>
+    <div class="big">{won(base.net)}</div>
+    <div class="muted small">연 실수령액 {won(base.net * 12)} · 월 공제 합계 {won(base.grossMonthly - base.net)}</div>
+    <table>
+      <tr><th>항목</th><th>월 금액</th></tr>
+      <tr><td>세전 월급 (연봉 ÷ 12)</td><td>{won(base.grossMonthly)}</td></tr>
+      <tr><td>국민연금 ({RATES.np * 100}%)</td><td>-{won(base.np)}</td></tr>
+      <tr><td>건강보험 ({RATES.hi * 100}%)</td><td>-{won(base.hi)}</td></tr>
+      <tr><td>장기요양보험</td><td>-{won(base.ltc)}</td></tr>
+      <tr><td>고용보험 ({RATES.ei * 100}%)</td><td>-{won(base.ei)}</td></tr>
+      <tr><td>소득세</td><td>-{won(base.tax)}</td></tr>
+      <tr><td>지방소득세</td><td>-{won(base.ltax)}</td></tr>
+      <tr class="total"><td>실수령액</td><td>{won(base.net)}</td></tr>
+    </table>
+  </div>
+  <p class="card">🧮 비과세액·부양가족·자녀 수를 바꿔서 내 조건으로 계산하려면 → <a href={`/calc/salary?amount=${annual}`}><strong>연봉 실수령액 계산기</strong></a></p>
+
+  <section class="prose">
+    <h2>부양가족 수에 따른 연봉 {kor(annual)} 실수령액</h2>
+    <p>기본공제 대상 가족이 한 명 늘어날 때마다 과세표준이 150만원 줄어 소득세가 낮아집니다. 8세 이상 20세 이하 자녀가 있으면 자녀세액공제가 추가됩니다.</p>
+    <table>
+      <tr><th>조건</th><th>월 소득세+지방소득세</th><th>월 실수령액</th></tr>
+      {families.map(({ f, r }) => <tr><td>부양가족 {f}인 (본인 포함)</td><td>{won(r.tax + r.ltax)}</td><td><strong>{won(r.net)}</strong></td></tr>)}
+      {children.map(({ c, r }) => <tr><td>배우자 + 자녀 {c}명 (8~20세)</td><td>{won(r.tax + r.ltax)}</td><td><strong>{won(r.net)}</strong></td></tr>)}
+    </table>
+    <h2>퇴직금 포함 연봉이라면</h2>
+    <p>연봉에 퇴직금이 포함된 계약(연봉 ÷ 13)이면 세전 월급이 {won(incl.grossMonthly)}으로 줄고, 실수령액은 <strong>약 {won(incl.net)}</strong>이 됩니다. 계약서에 "퇴직금 포함" 문구가 있는지 확인하세요.</p>
+    <h2>비과세 식대가 없다면</h2>
+    <p>월 20만원 식대 비과세가 적용되지 않으면 보험료와 세금 기준 급여가 커져 실수령액은 <strong>약 {won(noTaxfree.net)}</strong>으로 {won(base.net - noTaxfree.net)} 줄어듭니다.</p>
+    <h2>{YEAR}년 공제 기준</h2>
+    <table>
+      <tr><th>항목</th><th>근로자 부담</th></tr>
+      <tr><td>국민연금</td><td>{RATES.np * 100}% (기준소득월액 상한 {num(RATES.npCap)}원)</td></tr>
+      <tr><td>건강보험</td><td>{RATES.hi * 100}%</td></tr>
+      <tr><td>장기요양보험</td><td>건강보험료의 {RATES.ltc * 100}%</td></tr>
+      <tr><td>고용보험</td><td>{RATES.ei * 100}%</td></tr>
+      <tr><td>소득세</td><td>6~45% 누진세율, 근로소득공제·세액공제 적용 후 12개월 분할</td></tr>
+    </table>
+    <p class="hint">계산 결과는 참고용 추정치이며, 실제 원천징수액은 회사 규정과 간이세액표에 따라 달라질 수 있습니다.</p>
+  </section>
+
+  <section class="prose">
+    <h2>자주 묻는 질문</h2>
+    {faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+  <AdSlot position="bottom" />
+  <Coupang keywords={["가계부", "직장인 재테크 책"]} />
+
+  <section>
+    <h2>비슷한 연봉 실수령액</h2>
+    <ul class="chips">
+      {neighbors.map((a) => <li><a href={`/salary/${a}`}>연봉 {kor(a * 10000)}</a></li>)}
+    </ul>
+    <p><a href="/salary">연봉별 실수령액 전체 표 →</a></p>
+  </section>
+  {posts.length > 0 && (
+    <section>
+      <h2>관련 글</h2>
+      <ul class="list">{posts.map((p) => <li><a href={`/blog/${p.id}`}>{p.data.title}</a></li>)}</ul>
+    </section>
+  )}
+</Base>

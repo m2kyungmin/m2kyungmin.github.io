@@ -20,6 +20,16 @@ const posts = (await getCollection("blog")).sort((a, b) => +b.data.pubDate - +a.
       </div>
     </section>
   ))}
+  <section class="cat">
+    <h2>숫자별 바로보기</h2>
+    <p class="muted small">자주 찾는 금액은 미리 계산해 두었습니다. 검색하듯 골라 보세요.</p>
+    <div class="grid">
+      <a class="tile" href="/salary"><span class="emoji">📊</span><strong>연봉별 실수령액 표</strong><small>연봉 2,000만~1억5,000만원, 100만원 단위</small></a>
+      <a class="tile" href="/hourly"><span class="emoji">🕘</span><strong>시급별 월급 표</strong><small>시급 9,000~20,000원, 주휴수당 포함</small></a>
+      <a class="tile" href="/loan"><span class="emoji">🏦</span><strong>대출 금액별 이자</strong><small>1,000만~10억원, 금리·기간별 월 상환액</small></a>
+      <a class="tile" href="/savings"><span class="emoji">🐷</span><strong>월 적금액별 만기 수령액</strong><small>월 5만~200만원, 기간·금리별 세후 금액</small></a>
+    </div>
+  </section>
   <AdSlot position="bottom" />
   {posts.length > 0 && (
     <section class="cat">

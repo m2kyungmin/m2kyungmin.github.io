@@ -81,57 +81,30 @@ const faq = [
   </div>
 
   <script>
-    // 2026년 기준 상수. 매년 이 값만 갱신하면 됩니다.
-    const R = { np: 0.045, npCap: 6370000, hi: 0.03595, ltc: 0.1314, ei: 0.009 };
-    const BR = [[14000000,0.06],[50000000,0.15],[88000000,0.24],[150000000,0.35],[300000000,0.38],[500000000,0.40],[1000000000,0.42],[Infinity,0.45]];
-    const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
-    const kor = (n) => { n=Math.round(n); if(n>=100000000) return (n/100000000).toFixed(n%100000000?1:0)+"억원"; if(n>=10000) return Math.round(n/10000).toLocaleString()+"만원"; return n.toLocaleString()+"원"; };
-
-    function earnedIncomeDeduction(y){ if(y<=5e6)return y*0.7; if(y<=1.5e7)return 3.5e6+(y-5e6)*0.4; if(y<=4.5e7)return 7.5e6+(y-1.5e7)*0.15; if(y<=1e8)return 1.2e7+(y-4.5e7)*0.05; return Math.min(1.475e7+(y-1e8)*0.02, 2e7); }
-    function progressive(base){ let t=0,prev=0; for(const [lim,rate] of BR){ if(base>prev){ t+=(Math.min(base,lim)-prev)*rate; prev=lim; } else break; } return t; }
-    function earnedIncomeTaxCredit(tax, y){ let c = tax<=1.3e6 ? tax*0.55 : 715000+(tax-1.3e6)*0.3; let cap; if(y<=3.3e7)cap=740000; else if(y<=7e7)cap=Math.max(660000,740000-(y-3.3e7)*0.008); else if(y<=1.2e8)cap=Math.max(500000,660000-(y-7e7)/2*0.01); else cap=Math.max(200000,500000-(y-1.2e8)/2*0.01); return Math.min(c,cap); }
-
-    function calc(annualTaxable, taxfreeMonthly, family, children, div){
-      const grossMonthly = annualTaxable/div + taxfreeMonthly;      // 세전 월급(비과세 포함)
-      const taxableMonthly = annualTaxable/div;                     // 보험료·세금 기준 월급
-      const np = Math.min(taxableMonthly, R.npCap)*R.np;
-      const hi = taxableMonthly*R.hi;
-      const ltc = hi*R.ltc;
-      const ei = taxableMonthly*R.ei;
-      // 소득세: 연 단위 추정(근로소득공제 → 인적공제 → 연금보험료공제 → 세액공제) 후 /12
-      const y = annualTaxable;
-      let base = y - earnedIncomeDeduction(y) - 1.5e6*family - np*12 - specialDeduction(y);
-      base = Math.max(0, base);
-      let tax = progressive(base);
-      tax -= earnedIncomeTaxCredit(tax, y);
-      tax -= corrChildren(children); // 자녀세액공제: 1명 25만, 2명 55만, 3명 이상 65만+30만/명
-      tax = Math.max(0, tax)/12;
-      const ltax = tax*0.1;
-      const net = grossMonthly - np - hi - ltc - ei - tax - ltax;
-      return { grossMonthly, np, hi, ltc, ei, tax, ltax, net };
-    }
-    // 간이세액표가 가정하는 특별소득·세액공제 상당액 (국세청 간이세액표 산출 기준)
-    function specialDeduction(y){ if(y<=3e7)return 3.1e6+y*0.04; if(y<=4.5e7)return 3.1e6+y*0.04-(y-3e7)*0.05; if(y<=7e7)return 3.1e6+y*0.015; return 3.1e6+y*0.005; }
-    function corrChildren(c){ if(c<=0)return 0; if(c===1)return 250000; if(c===2)return 550000; return 650000+(c-3)*300000; }
-
+    import { calcSalary } from "../../lib/salary";
+    import { won, kor } from "../../lib/format";
     const $ = (id) => document.getElementById(id);
     function run(){
       const mode = document.querySelector('input[name=mode]:checked').value;
       const amount = +$("amount").value||0, taxfree=+$("taxfree").value||0, family=Math.max(1,+$("family").value||1), children=+$("children").value||0, div=+$("months").value;
       let annual = mode==="year" ? amount : amount*12;
       const annualTaxable = Math.max(0, annual - taxfree*(mode==="year"?div:12));
-      const r = calc(annualTaxable, taxfree, family, children, mode==="year"?div:12);
+      const r = calcSalary(annualTaxable, taxfree, family, children, mode==="year"?div:12);
       $("net").textContent = won(r.net); $("netYear").textContent = won(r.net*12);
       $("ded").textContent = won(r.grossMonthly-r.net);
       $("gross").textContent=won(r.grossMonthly); $("np").textContent=won(r.np); $("hi").textContent=won(r.hi); $("ltc").textContent=won(r.ltc); $("ei").textContent=won(r.ei); $("tax").textContent=won(r.tax); $("ltax").textContent=won(r.ltax); $("net2").textContent=won(r.net);
       $("out").hidden=false;
     }
+    // /calc/salary?amount=40000000 형태로 진입하면 값 미리 채움 (연봉별 페이지에서 링크)
+    const qa = new URLSearchParams(location.search).get("amount");
+    if (qa && +qa > 0) $("amount").value = String(+qa);
     $("go").addEventListener("click", run);
     $("amount").addEventListener("input", ()=>{ $("amountHint").textContent = kor(+$("amount").value||0); });
+    $("amountHint").textContent = kor(+$("amount").value||0);
     document.querySelectorAll('input[name=mode]').forEach(el=>el.addEventListener("change",()=>{ const m=el.value; if(!el.checked)return; $("amount").value = m==="year"? 40000000 : 3000000; $("amountHint").textContent=kor(+$("amount").value); }));
     // 빠른 참조 표
     const rows=[]; for(let y=2.4e7;y<=1.2e8;y+=(y<6e7?4e6:1e7)) rows.push(y);
-    const q=$("quick"); for(let i=0;i<rows.length;i+=2){ const tr=document.createElement("tr"); [rows[i],rows[i+1]].forEach(y=>{ if(!y){tr.innerHTML+="<td></td><td></td>";return;} const r=calc(y-2.4e6,200000,1,0,12); tr.innerHTML+=`<td>${kor(y)}</td><td>${won(r.net)}</td>`; }); q.appendChild(tr); }
+    const q=$("quick"); for(let i=0;i<rows.length;i+=2){ const tr=document.createElement("tr"); [rows[i],rows[i+1]].forEach(y=>{ if(!y){tr.innerHTML+="<td></td><td></td>";return;} const r=calcSalary(y-2.4e6,200000,1,0,12); tr.innerHTML+=`<td><a href="/salary/${y/1e4}">${kor(y)}</a></td><td>${won(r.net)}</td>`; }); q.appendChild(tr); }
     run();
   </script>
 </CalcShell>

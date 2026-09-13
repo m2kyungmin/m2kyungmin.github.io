@@ -83,6 +83,11 @@ const MIN_WAGE_2026 = 10320;
     const $ = (id) => document.getElementById(id);
     const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
 
+    // URL의 ?wage= 값으로 시급 입력값을 미리 채웁니다 (프로그래매틱 SEO 페이지 연동용)
+    const _params = new URLSearchParams(location.search);
+    const _wage = _params.get("wage");
+    if (_wage && !isNaN(+_wage)) $("wage").value = _wage;
+
     function run(){
       const wage = +$("wage").value || 0;
       const dailyHours = +$("dailyHours").value || 0;

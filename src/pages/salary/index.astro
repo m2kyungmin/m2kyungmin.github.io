@@ -1,0 +1,31 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { calcAnnual, YEAR } from "../../lib/salary";
+import { won, kor } from "../../lib/format";
+import { AMOUNTS } from "./[amount].astro";
+const rows = AMOUNTS.map((a) => ({ a, r: calcAnnual(a * 10000) }));
+const groups = [
+  { label: "연봉 2,000만 ~ 3,900만원", rows: rows.filter((x) => x.a < 4000) },
+  { label: "연봉 4,000만 ~ 5,900만원", rows: rows.filter((x) => x.a >= 4000 && x.a < 6000) },
+  { label: "연봉 6,000만 ~ 7,900만원", rows: rows.filter((x) => x.a >= 6000 && x.a < 8000) },
+  { label: "연봉 8,000만 ~ 9,900만원", rows: rows.filter((x) => x.a >= 8000 && x.a < 10000) },
+  { label: "연봉 1억 ~ 1억5,000만원", rows: rows.filter((x) => x.a >= 10000) },
+];
+---
+<Base title={`연봉별 실수령액 표 (${YEAR}년)`} description={`연봉 2,000만원부터 1억5,000만원까지 100만원 단위로 ${YEAR}년 월 실수령액을 정리한 표. 4대보험·소득세 공제 후 실제 수령액을 한눈에 비교하세요.`} keywords={["연봉 실수령액 표", "연봉별 실수령액", "2026 실수령액", "세후 월급표"]}>
+  <nav class="crumbs"><a href="/">홈</a> › 연봉별 실수령액</nav>
+  <h1>연봉별 실수령액 표 ({YEAR}년 기준)</h1>
+  <p class="lead">월 비과세 20만원, 부양가족 본인 1인 기준 추정치입니다. 연봉을 누르면 공제 내역과 부양가족별 금액을 볼 수 있고, <a href="/calc/salary">계산기</a>에서 내 조건으로 직접 계산할 수도 있습니다.</p>
+  <AdSlot position="top" />
+  {groups.map((g) => (
+    <section class="prose">
+      <h2>{g.label}</h2>
+      <table>
+        <tr><th>연봉</th><th>세전 월급</th><th>월 공제액</th><th>월 실수령액</th></tr>
+        {g.rows.map(({ a, r }) => <tr><td><a href={`/salary/${a}`}>{kor(a * 10000)}</a></td><td>{won(r.grossMonthly)}</td><td>{won(r.grossMonthly - r.net)}</td><td><strong>{won(r.net)}</strong></td></tr>)}
+      </table>
+    </section>
+  ))}
+  <AdSlot position="bottom" />
+</Base>

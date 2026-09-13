@@ -137,6 +137,17 @@ const faq = [
     $("go").addEventListener("click", run);
     ["amount","months","rate","taxType"].forEach((id) => $(id).addEventListener("input", run));
     $("taxType").addEventListener("change", run);
+
+    // URL의 ?monthly= 값이 있으면 정기적금 모드로 전환하고 월 납입액을 미리 채웁니다 (프로그래매틱 SEO 페이지 연동용)
+    const _params = new URLSearchParams(location.search);
+    const _monthly = _params.get("monthly");
+    if (_monthly && !isNaN(+_monthly)) {
+      const savingsRadio = document.querySelector('input[name=mode][value=savings]');
+      savingsRadio.checked = true;
+      $("amountLabel").textContent = labels.savings;
+      $("amount").value = _monthly;
+    }
+
     run();
   </script>
 </CalcShell>

@@ -79,6 +79,11 @@ const faq = [
     const won = (n) => Math.round(n).toLocaleString("ko-KR") + "원";
     const kor = (n) => { n = Math.round(n); if (n >= 100000000) return (n / 100000000).toFixed(n % 100000000 ? 1 : 0) + "억원"; if (n >= 10000) return Math.round(n / 10000).toLocaleString() + "만원"; return n.toLocaleString() + "원"; };
 
+    // URL의 ?amount= 값으로 대출금액 입력값을 미리 채웁니다 (프로그래매틱 SEO 페이지 연동용)
+    const _params = new URLSearchParams(location.search);
+    const _amount = _params.get("amount");
+    if (_amount && !isNaN(+_amount)) $("principal").value = _amount;
+
     function calcEqualPayment(P, i, n, g) {
       const m = Math.max(1, n - g);
       const payment = i > 0 ? (P * i) / (1 - Math.pow(1 + i, -m)) : P / m;

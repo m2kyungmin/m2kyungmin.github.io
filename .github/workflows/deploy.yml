@@ -40,3 +40,24 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4
+  indexnow:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Collect changed files
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" > changed.txt || true
+            echo "mode=--changed changed.txt" >> "$GITHUB_ENV"
+          else
+            echo "mode=--all" >> "$GITHUB_ENV"
+          fi
+          echo "changed files: $(wc -l < changed.txt 2>/dev/null || echo 0)"
+      - name: Submit to IndexNow (Naver, Bing)
+        run: sleep 60 && node scripts/indexnow.mjs $mode
+        env:
+          SITE_URL: ${{ vars.SITE_URL }}

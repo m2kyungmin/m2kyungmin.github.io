@@ -1,0 +1,32 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import { weeklyPay, MIN_WAGE_2026 } from "../../lib/finance";
+import { won, num } from "../../lib/format";
+import { WAGES } from "./[wage].astro";
+
+const YEAR = 2026;
+const rows = WAGES.map((w) => ({ w, r: weeklyPay(w, 8, 5, 0) }));
+const groups = [
+  { label: "시급 9,000 ~ 9,900원", rows: rows.filter((x) => x.w < 10000) },
+  { label: "시급 10,000 ~ 12,900원", rows: rows.filter((x) => x.w >= 10000 && x.w < 13000) },
+  { label: "시급 13,000 ~ 15,900원", rows: rows.filter((x) => x.w >= 13000 && x.w < 16000) },
+  { label: "시급 16,000 ~ 20,000원", rows: rows.filter((x) => x.w >= 16000) },
+];
+---
+<Base title={`시급별 월급 표 (${YEAR}년, 주휴수당 포함)`} description={`시급 9,000원부터 20,000원까지 주 40시간 근무 기준 주휴수당 포함 월급을 정리한 표. ${YEAR}년 최저시급 ${num(MIN_WAGE_2026)}원 포함.`} keywords={["시급 월급 계산", "주휴수당 계산기", "최저시급 2026", "시급별 월급표"]}>
+  <nav class="crumbs"><a href="/">홈</a> › 시급별 월급</nav>
+  <h1>시급별 월급 표 ({YEAR}년 기준)</h1>
+  <p class="lead">하루 8시간, 주 5일(주 40시간) 근무·주휴수당 포함 기준 추정치입니다. 시급을 누르면 근무시간별·연장근로 포함 금액을 볼 수 있고, <a href="/calc/hourly">계산기</a>에서 내 조건으로 직접 계산할 수도 있습니다.</p>
+  <AdSlot position="top" />
+  {groups.map((g) => (
+    <section class="prose">
+      <h2>{g.label}</h2>
+      <table>
+        <tr><th>시급</th><th>주급</th><th>월급 (주휴수당 포함)</th><th>연봉 환산</th></tr>
+        {g.rows.map(({ w, r }) => <tr><td><a href={`/hourly/${w}`}>{num(w)}원</a></td><td>{won(r.weekly)}</td><td><strong>{won(r.monthly)}</strong></td><td>{won(r.annual)}</td></tr>)}
+      </table>
+    </section>
+  ))}
+  <AdSlot position="bottom" />
+</Base>

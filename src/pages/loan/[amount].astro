@@ -1,0 +1,126 @@
+---
+import Base from "../../layouts/Base.astro";
+import AdSlot from "../../components/AdSlot.astro";
+import Coupang from "../../components/Coupang.astro";
+import { equalPayment, equalPrincipal, bulletTotalInterest } from "../../lib/finance";
+import { won, kor, num } from "../../lib/format";
+import { getCollection } from "astro:content";
+
+const YEAR = 2026;
+
+// 대출금액(만원 단위): 1,000~1억은 1,000만원 단위, 1억5,000~5억은 5,000만원 단위, 6억~10억은 1억 단위
+export const AMOUNTS = Array.from(
+  new Set([
+    ...Array.from({ length: 10 }, (_, i) => 1000 + i * 1000), // 1,000~10,000
+    ...Array.from({ length: 8 }, (_, i) => 15000 + i * 5000), // 15,000~50,000
+    ...Array.from({ length: 5 }, (_, i) => 60000 + i * 10000), // 60,000~100,000
+  ])
+).sort((a, b) => a - b);
+
+export async function getStaticPaths() {
+  return AMOUNTS.map((a) => ({ params: { amount: String(a) } }));
+}
+
+const amountMan = Number(Astro.params.amount);
+const amount = amountMan * 10000;
+const isCredit = amount <= 100000000; // 1억 이하는 신용대출 성격으로 취급
+const headlineTerm = isCredit ? 10 : 30; // 년
+const RATE_DEFAULT = 4.0;
+const headline = equalPayment(amount, RATE_DEFAULT, headlineTerm * 12);
+
+const title = `대출 ${kor(amount)} 이자 (${YEAR}년) 연 ${RATE_DEFAULT}% ${headlineTerm}년 월 ${kor(headline.monthly)}`;
+const description = `대출 ${kor(amount)}을 연 ${RATE_DEFAULT}%, ${headlineTerm}년 원리금균등으로 상환하면 월 상환액은 약 ${won(headline.monthly)}, 총 이자는 약 ${won(headline.totalInterest)}입니다. 금리·기간별 월 상환액과 상환방식별 총 이자를 표로 비교했습니다.`;
+
+const idx = AMOUNTS.indexOf(amountMan);
+const neighbors = AMOUNTS.slice(Math.max(0, idx - 5), idx).concat(AMOUNTS.slice(idx + 1, idx + 6));
+
+const RATES = [3.0, 3.5, 4.0, 4.5, 5.0, 6.0];
+const mainTerms = isCredit ? [1, 3, 5, 7, 10] : [10, 20, 30];
+const mainRows = RATES.map((rate) => ({
+  rate,
+  cols: mainTerms.map((term) => equalPayment(amount, rate, term * 12).monthly),
+}));
+
+const methodTerm = headlineTerm;
+const eqPay = equalPayment(amount, RATE_DEFAULT, methodTerm * 12);
+const eqPrinc = equalPrincipal(amount, RATE_DEFAULT, methodTerm * 12);
+const bullet = bulletTotalInterest(amount, RATE_DEFAULT, methodTerm * 12);
+
+const termTable = [1, 3, 5, 10, 20, 30].map((term) => ({ term, r: equalPayment(amount, RATE_DEFAULT, term * 12) }));
+
+const posts = (await getCollection("blog")).filter((p) => p.data.calc === "loan").sort((a, b) => +b.data.pubDate - +a.data.pubDate).slice(0, 4);
+
+const faq = [
+  { q: `대출 ${kor(amount)}의 월 상환액은 얼마인가요?`, a: `연 ${RATE_DEFAULT}%, ${headlineTerm}년 원리금균등 상환 기준으로 월 상환액은 약 ${won(headline.monthly)}이고, 총 이자는 약 ${won(headline.totalInterest)}입니다. 금리와 기간에 따라 크게 달라지니 위 표를 참고하세요.` },
+  { q: "원리금균등과 원금균등 중 어느 쪽이 유리한가요?", a: "총 이자만 보면 원금균등 상환이 더 적습니다. 초기에 원금을 더 많이 갚아 이자가 붙는 잔액이 빨리 줄기 때문입니다. 다만 초반 상환 부담이 커서 소득이 일정하다면 원리금균등을 선택하는 경우가 많습니다." },
+  { q: "금리가 1%p 오르면 상환액이 얼마나 늘어나나요?", a: "위 표에서 같은 기간의 금리별 월 상환액을 비교해 보면 차이를 확인할 수 있습니다. 대출금액과 기간이 길수록 금리 변동에 따른 상환액 차이가 커집니다." },
+];
+const jsonLd = [
+  { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faq.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
+    { "@type": "ListItem", position: 1, name: "홈", item: new URL("/", Astro.site).toString() },
+    { "@type": "ListItem", position: 2, name: "대출 금액별 이자", item: new URL("/loan", Astro.site).toString() },
+    { "@type": "ListItem", position: 3, name: `대출 ${kor(amount)}`, item: new URL(`/loan/${amountMan}`, Astro.site).toString() },
+  ] },
+];
+---
+<Base title={title} description={description} keywords={[`대출 ${kor(amount)} 이자`, `대출 ${amountMan}만원 이자`, "대출 이자 계산기", "원리금균등 계산"]} jsonLd={jsonLd}>
+  <nav class="crumbs"><a href="/">홈</a> › <a href="/loan">대출 금액별 이자</a> › 대출 {kor(amount)}</nav>
+  <h1>대출 {kor(amount)} 이자 ({YEAR}년 기준)</h1>
+  <p class="lead">대출 {kor(amount)}을 연 {RATE_DEFAULT}%, {headlineTerm}년 원리금균등 방식으로 상환하면 월 상환액은 <strong>약 {won(headline.monthly)}</strong>, 총 이자는 <strong>약 {won(headline.totalInterest)}</strong>입니다.</p>
+  <AdSlot position="top" />
+  <div class="result">
+    <div>월 상환액 (연 {RATE_DEFAULT}%, {headlineTerm}년, 원리금균등)</div>
+    <div class="big">{won(headline.monthly)}</div>
+    <div class="muted small">총 이자 {won(headline.totalInterest)} · 총 상환액 {won(headline.total)}</div>
+    <table>
+      <tr><th>금리</th>{mainTerms.map((t) => <th>{t}년</th>)}</tr>
+      {mainRows.map((row) => (
+        <tr>
+          <td>연 {row.rate}%</td>
+          {row.cols.map((m) => <td>{won(m)}</td>)}
+        </tr>
+      ))}
+    </table>
+    <p class="hint">{isCredit ? "1억원 이하 대출은 신용대출 성격을 고려해 1~10년 기간으로 비교했습니다." : "주택담보대출 등을 고려해 10~30년 기간으로 비교했습니다."}</p>
+  </div>
+  <p class="card">🧮 거치기간·상환방식을 바꿔서 내 조건으로 계산하려면 → <a href={`/calc/loan?amount=${amount}`}><strong>대출 이자 계산기</strong></a></p>
+
+  <section class="prose">
+    <h2>상환방식별 비교 (연 {RATE_DEFAULT}%, {methodTerm}년 기준)</h2>
+    <p>같은 대출금액·금리·기간이라도 상환방식에 따라 총 이자가 크게 달라집니다.</p>
+    <table>
+      <tr><th>상환방식</th><th>월 상환액</th><th>총 이자</th></tr>
+      <tr><td>원리금균등</td><td>{won(eqPay.monthly)}</td><td>{won(eqPay.totalInterest)}</td></tr>
+      <tr><td>원금균등</td><td>{won(eqPrinc.firstMonthly)} → {won(eqPrinc.lastMonthly)}</td><td>{won(eqPrinc.totalInterest)}</td></tr>
+      <tr><td>만기일시</td><td>{won(bullet.monthlyInterest)} (이자만)</td><td>{won(bullet.totalInterest)}</td></tr>
+    </table>
+    <h2>기간별 원리금균등 월 상환액 (연 {RATE_DEFAULT}% 기준)</h2>
+    <table>
+      <tr><th>기간</th><th>월 상환액</th><th>총 이자</th></tr>
+      {termTable.map(({ term, r }) => <tr><td>{term}년</td><td><strong>{won(r.monthly)}</strong></td><td>{won(r.totalInterest)}</td></tr>)}
+    </table>
+    <p class="hint">모든 계산은 금리가 상환 기간 내내 동일하다고 가정한 추정치입니다. 실제 대출은 심사 결과와 금리 변동에 따라 달라질 수 있습니다.</p>
+  </section>
+
+  <section class="prose">
+    <h2>자주 묻는 질문</h2>
+    {faq.map((f) => <details><summary>{f.q}</summary><p>{f.a}</p></details>)}
+  </section>
+  <AdSlot position="bottom" />
+  <Coupang keywords={["부동산 계약 책", "가계부"]} />
+
+  <section>
+    <h2>비슷한 대출금액 이자</h2>
+    <ul class="chips">
+      {neighbors.map((a) => <li><a href={`/loan/${a}`}>대출 {kor(a * 10000)}</a></li>)}
+    </ul>
+    <p><a href="/loan">대출 금액별 이자 전체 표 →</a></p>
+  </section>
+  {posts.length > 0 && (
+    <section>
+      <h2>관련 글</h2>
+      <ul class="list">{posts.map((p) => <li><a href={`/blog/${p.id}`}>{p.data.title}</a></li>)}</ul>
+    </section>
+  )}
+</Base>
