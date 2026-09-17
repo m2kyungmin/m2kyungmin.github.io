@@ -1,0 +1,32 @@
+name: Naver blog post
+on:
+  push:
+    branches: [main]
+    paths: ["naver/queue/**"]
+  workflow_dispatch:
+    inputs:
+      file:
+        description: "특정 큐 파일만 발행 (예: 2026-09-18.json). 비우면 미발행분 1편"
+        required: false
+permissions:
+  contents: write
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Post to Naver blog
+        run: node scripts/naver-post.mjs
+        env:
+          NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+          NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+          NAVER_REFRESH_TOKEN: ${{ secrets.NAVER_REFRESH_TOKEN }}
+          ONLY_FILE: ${{ github.event.inputs.file }}
+      - name: Record posted
+        run: |
+          git config user.name "money-calc-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add naver/posted.json
+          git diff --cached --quiet || (git commit -m "naver: 발행 기록 갱신" && git pull --rebase origin main && git push)
