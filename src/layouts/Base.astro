@@ -11,7 +11,11 @@ interface Props {
   publishedTime?: string;
 }
 const { title, description, keywords = [], jsonLd, type = "website", publishedTime } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+// build.format:"file" 때문에 빌드 시 Astro.url.pathname 이 "/index.html", "/calc/hourly.html" 형태다.
+// 사이트맵·내부 링크는 확장자 없는 URL(/calc/hourly)을 쓰므로 canonical/og:url 도 같은 형태로 맞춘다.
+// (둘이 다르면 Google 이 "리디렉션/중복" 으로 보고 색인을 미룬다 — Search Console 2026-09-16.)
+const cleanPath = Astro.url.pathname.replace(/\/index\.html$/, "").replace(/\.html$/, "") || "/";
+const canonical = new URL(cleanPath, Astro.site).toString();
 const fullTitle = title === SITE.name ? `${SITE.name} | ${SITE.tagline}` : `${title} | ${SITE.name}`;
 const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ld.push({
