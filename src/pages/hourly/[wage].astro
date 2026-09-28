@@ -6,17 +6,12 @@ import Offers from "../../components/Offers.astro";
 import { weeklyPay, MIN_WAGE_2026 } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
 import { getCollection } from "astro:content";
+import { WAGES as ALL_WAGES, INDEXED_WAGES, isIndexedWage } from "../../lib/indexing.mjs";
 
 const YEAR = 2026;
 
-// 시급 9,000~13,000원은 100원 단위, 13,000~20,000원은 500원 단위. 2026년 최저시급(10,320원) 포함.
-export const WAGES = Array.from(
-  new Set([
-    ...Array.from({ length: 41 }, (_, i) => 9000 + i * 100),
-    ...Array.from({ length: 15 }, (_, i) => 13000 + i * 500),
-    MIN_WAGE_2026,
-  ])
-).sort((a, b) => a - b);
+// 시급 9,000~20,000원 (단위·색인 대상은 lib/indexing.mjs)
+export const WAGES = ALL_WAGES;
 
 export async function getStaticPaths() {
   return WAGES.map((w) => ({ params: { wage: String(w) } }));
@@ -28,8 +23,9 @@ const base = weeklyPay(wage, 8, 5, 0); // 주 40시간(8시간×5일) 기준
 const title = `시급 ${num(wage)}원 월급 (${YEAR}년) 주휴수당 포함 약 ${kor(base.monthly)}`;
 const description = `시급 ${num(wage)}원을 주 40시간(8시간×5일) 근무 기준으로 계산하면 주휴수당 포함 월급은 약 ${won(base.monthly)}, 연봉 환산 약 ${won(base.annual)}입니다. 주 근무시간별·연장근로 포함 월급까지 표로 정리했습니다.`;
 
-const idx = WAGES.indexOf(wage);
-const neighbors = WAGES.slice(Math.max(0, idx - 5), idx).concat(WAGES.slice(idx + 1, idx + 6));
+// 내부 링크는 색인 대상 시급으로 모아 크롤링을 집중시킨다
+const idx = INDEXED_WAGES.findIndex((w) => w >= wage);
+const neighbors = INDEXED_WAGES.slice(Math.max(0, idx - 5), idx).concat(INDEXED_WAGES.slice(idx, idx + 6)).filter((w) => w !== wage);
 
 const hourRows = [15, 20, 25, 30, 35, 40].map((h) => {
   const withHoliday = weeklyPay(wage, h, 1, 0); // 주 h시간 근무(요일 배분 무관)
@@ -62,7 +58,7 @@ const jsonLd = [
   ] },
 ];
 ---
-<Base title={title} description={description} keywords={[`시급 ${num(wage)}원 월급`, `시급 ${num(wage)} 계산`, "주휴수당 계산기", "알바 월급"]} jsonLd={jsonLd}>
+<Base title={title} description={description} keywords={[`시급 ${num(wage)}원 월급`, `시급 ${num(wage)} 계산`, "주휴수당 계산기", "알바 월급"]} jsonLd={jsonLd} noindex={!isIndexedWage(wage)}>
   <nav class="crumbs"><a href="/">홈</a> › <a href="/hourly">시급별 월급</a> › 시급 {num(wage)}원</nav>
   <h1>시급 {num(wage)}원 월급 ({YEAR}년 기준)</h1>
   <p class="lead">시급 {num(wage)}원으로 주 40시간(하루 8시간 × 주 5일) 근무하면, 주휴수당을 포함한 월급은 <strong>약 {won(base.monthly)}</strong>입니다. 연봉으로 환산하면 약 {won(base.annual)}입니다.</p>

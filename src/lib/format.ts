@@ -7,3 +7,5 @@ export const kor = (n: number) => {
   if (n >= 10000) return Math.round(n / 10000).toLocaleString("ko-KR") + "만원";
   return n.toLocaleString("ko-KR") + "원";
 };
+/** 0.1314 → "13.14" (부동소수점 오차 없이 퍼센트 표기) */
+export const pct = (r: number) => String(Number((r * 100).toFixed(4)));

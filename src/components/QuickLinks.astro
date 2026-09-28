@@ -1,0 +1,43 @@
+---
+// 계산기·블로그 → 색인 대상 금액별 페이지로 정적 내부 링크를 건다 (크롤링 우선순위 집중용).
+import { kor, num } from "../lib/format";
+import { MIN_WAGE_2026 } from "../lib/indexing.mjs";
+
+interface Props {
+  calc?: string;
+}
+const { calc } = Astro.props;
+
+type Group = { title: string; hub: { href: string; label: string }; items: { href: string; label: string }[] };
+const salary: Group = {
+  title: "연봉별 실수령액 바로보기",
+  hub: { href: "/salary", label: "연봉별 실수령액 전체 표" },
+  items: [3000, 3500, 4000, 4500, 5000, 6000, 7000, 8000, 10000].map((a) => ({ href: `/salary/${a}`, label: `연봉 ${kor(a * 10000)}` })),
+};
+const hourly: Group = {
+  title: "시급별 월급 바로보기",
+  hub: { href: "/hourly", label: "시급별 월급 전체 표" },
+  items: [MIN_WAGE_2026, 11000, 12000, 13000, 15000, 20000].map((w) => ({ href: `/hourly/${w}`, label: `시급 ${num(w)}원` })),
+};
+const loan: Group = {
+  title: "대출 금액별 이자 바로보기",
+  hub: { href: "/loan", label: "대출 금액별 이자 전체 표" },
+  items: [1000, 3000, 5000, 10000, 20000, 30000].map((a) => ({ href: `/loan/${a}`, label: `대출 ${kor(a * 10000)}` })),
+};
+const savings: Group = {
+  title: "월 적금액별 만기 수령액 바로보기",
+  hub: { href: "/savings", label: "적금액별 전체 표" },
+  items: [10, 30, 50, 100].map((m) => ({ href: `/savings/${m}`, label: `월 ${kor(m * 10000)}` })),
+};
+const BY_CALC: Record<string, Group> = { salary, severance: salary, hourly, loan, rent: loan, compound: savings };
+const group = calc ? BY_CALC[calc] : undefined;
+---
+{group && (
+  <section>
+    <h2>{group.title}</h2>
+    <ul class="chips">
+      {group.items.map((i) => <li><a href={i.href}>{i.label}</a></li>)}
+    </ul>
+    <p><a href={group.hub.href}>{group.hub.label} →</a></p>
+  </section>
+)}

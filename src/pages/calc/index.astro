@@ -9,7 +9,7 @@ import { CALCS, CATEGORIES } from "../../lib/site";
       <h2>{cat}</h2>
       <div class="grid">
         {CALCS.filter((c) => c.category === cat).map((c) => (
-          <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.title}</strong><small>{c.description}</small></a>
+          <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.title}</strong><small class="clamp">{c.description}</small></a>
         ))}
       </div>
     </section>

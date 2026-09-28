@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import AdSlot from "./AdSlot.astro";
 import Coupang from "./Coupang.astro";
 import Offers from "./Offers.astro";
+import QuickLinks from "./QuickLinks.astro";
 import { CALCS, getCalc } from "../lib/site";
 import { getCollection } from "astro:content";
 
@@ -38,7 +39,7 @@ if (faq.length) {
   });
 }
 ---
-<Base title={calc.title} description={calc.description} keywords={calc.keywords} jsonLd={jsonLd}>
+<Base title={calc.seoTitle} description={calc.description} keywords={calc.keywords} jsonLd={jsonLd}>
   <nav class="crumbs"><a href="/">홈</a> › <a href="/calc">계산기</a> › {calc.short}</nav>
   <h1>{calc.emoji} {calc.title}</h1>
   <p class="lead">{calc.description}</p>
@@ -63,6 +64,7 @@ if (faq.length) {
   )}
   <AdSlot position="bottom" />
   <Coupang keywords={products} />
+  <QuickLinks calc={slug} />
   {posts.length > 0 && (
     <section>
       <h2>관련 글</h2>
@@ -75,7 +77,7 @@ if (faq.length) {
     <h2>다른 계산기</h2>
     <div class="grid">
       {related.map((c) => (
-        <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.short}</strong><small>{c.description}</small></a>
+        <a class="tile" href={`/calc/${c.slug}`}><span class="emoji">{c.emoji}</span><strong>{c.short}</strong><small class="clamp">{c.description}</small></a>
       ))}
     </div>
   </section>

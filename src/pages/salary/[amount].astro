@@ -4,11 +4,12 @@ import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
 import Offers from "../../components/Offers.astro";
 import { calcAnnual, YEAR, RATES } from "../../lib/salary";
-import { won, kor, num } from "../../lib/format";
+import { won, kor, num, pct } from "../../lib/format";
 import { getCollection } from "astro:content";
+import { SALARY_AMOUNTS, INDEXED_SALARY, isIndexedSalary } from "../../lib/indexing.mjs";
 
-// 연봉 2,000만 ~ 1억5,000만원, 100만원 단위 (URL은 만원 단위 숫자)
-export const AMOUNTS = Array.from({ length: 131 }, (_, i) => 2000 + i * 100);
+// 연봉 2,000만 ~ 1억5,000만원, 100만원 단위 (URL은 만원 단위 숫자). 색인은 일부만 — lib/indexing.mjs
+export const AMOUNTS = SALARY_AMOUNTS;
 export async function getStaticPaths() {
   return AMOUNTS.map((a) => ({ params: { amount: String(a) } }));
 }
@@ -17,12 +18,21 @@ const annual = amountMan * 10000;
 const base = calcAnnual(annual);
 const title = `연봉 ${kor(annual)} 실수령액 (${YEAR}년 기준) 월 ${kor(base.net)}`;
 const description = `연봉 ${kor(annual)}의 ${YEAR}년 월 실수령액은 약 ${won(base.net)}입니다. 4대보험·소득세 공제 내역, 부양가족 수별 실수령액, 퇴직금 포함 연봉일 때 금액까지 표로 정리했습니다.`;
-const idx = AMOUNTS.indexOf(amountMan);
-const neighbors = AMOUNTS.slice(Math.max(0, idx - 5), idx).concat(AMOUNTS.slice(idx + 1, idx + 6));
+// 내부 링크는 색인 대상 금액으로 모아 크롤링을 집중시킨다
+const idx = INDEXED_SALARY.findIndex((a) => a >= amountMan);
+const neighbors = INDEXED_SALARY.slice(Math.max(0, idx - 5), idx).concat(INDEXED_SALARY.slice(idx, idx + 6)).filter((a) => a !== amountMan);
 const families = [1, 2, 3, 4].map((f) => ({ f, r: calcAnnual(annual, { family: f }) }));
 const children = [1, 2].map((c) => ({ c, r: calcAnnual(annual, { family: 1 + c, children: c }) }));
 const incl = calcAnnual(annual, { div: 13 });
 const noTaxfree = calcAnnual(annual, { taxfree: 0 });
+// 금액마다 달라지는 해석 지표: 실효 공제율, 인상분 실수령 비율, 시급 환산(월 209시간)
+const deductRate = ((base.grossMonthly - base.net) / base.grossMonthly) * 100;
+const raises = [100, 300, 500, 1000].map((d) => {
+  const r = calcAnnual(annual + d * 10000);
+  const gain = r.net - base.net;
+  return { d, net: r.net, gain, kept: (gain * 12) / (d * 10000) * 100 };
+});
+const hourlyEquiv = base.grossMonthly / 209;
 const posts = (await getCollection("blog")).filter((p) => p.data.calc === "salary").sort((a, b) => +b.data.pubDate - +a.data.pubDate).slice(0, 4);
 const faq = [
   { q: `연봉 ${kor(annual)}이면 월급은 얼마인가요?`, a: `세전 월급은 ${won(annual / 12)}이고, 4대보험과 소득세를 뺀 실수령액은 1인 가구 기준 약 ${won(base.net)}입니다.` },
@@ -38,7 +48,7 @@ const jsonLd = [
   ] },
 ];
 ---
-<Base title={title} description={description} keywords={[`연봉 ${amountMan} 실수령액`, `연봉 ${kor(annual)} 실수령액`, `연봉 ${amountMan}만원 월급`, "세후 연봉"]} jsonLd={jsonLd}>
+<Base title={title} description={description} keywords={[`연봉 ${amountMan} 실수령액`, `연봉 ${kor(annual)} 실수령액`, `연봉 ${amountMan}만원 월급`, "세후 연봉"]} jsonLd={jsonLd} noindex={!isIndexedSalary(amountMan)}>
   <nav class="crumbs"><a href="/">홈</a> › <a href="/salary">연봉별 실수령액</a> › 연봉 {kor(annual)}</nav>
   <h1>연봉 {kor(annual)} 실수령액 ({YEAR}년 기준)</h1>
   <p class="lead">연봉 {kor(annual)}의 월 실수령액은 <strong>약 {won(base.net)}</strong>입니다. 세전 월급 {won(base.grossMonthly)}에서 4대보험료와 소득세 {won(base.grossMonthly - base.net)}이 공제된 금액입니다. (월 비과세 20만원, 부양가족 본인 1인 기준)</p>
@@ -50,10 +60,10 @@ const jsonLd = [
     <table>
       <tr><th>항목</th><th>월 금액</th></tr>
       <tr><td>세전 월급 (연봉 ÷ 12)</td><td>{won(base.grossMonthly)}</td></tr>
-      <tr><td>국민연금 ({RATES.np * 100}%)</td><td>-{won(base.np)}</td></tr>
-      <tr><td>건강보험 ({RATES.hi * 100}%)</td><td>-{won(base.hi)}</td></tr>
+      <tr><td>국민연금 ({pct(RATES.np)}%)</td><td>-{won(base.np)}</td></tr>
+      <tr><td>건강보험 ({pct(RATES.hi)}%)</td><td>-{won(base.hi)}</td></tr>
       <tr><td>장기요양보험</td><td>-{won(base.ltc)}</td></tr>
-      <tr><td>고용보험 ({RATES.ei * 100}%)</td><td>-{won(base.ei)}</td></tr>
+      <tr><td>고용보험 ({pct(RATES.ei)}%)</td><td>-{won(base.ei)}</td></tr>
       <tr><td>소득세</td><td>-{won(base.tax)}</td></tr>
       <tr><td>지방소득세</td><td>-{won(base.ltax)}</td></tr>
       <tr class="total"><td>실수령액</td><td>{won(base.net)}</td></tr>
@@ -70,6 +80,13 @@ const jsonLd = [
       {families.map(({ f, r }) => <tr><td>부양가족 {f}인 (본인 포함)</td><td>{won(r.tax + r.ltax)}</td><td><strong>{won(r.net)}</strong></td></tr>)}
       {children.map(({ c, r }) => <tr><td>배우자 + 자녀 {c}명 (8~20세)</td><td>{won(r.tax + r.ltax)}</td><td><strong>{won(r.net)}</strong></td></tr>)}
     </table>
+    <h2>연봉 {kor(annual)}에서 연봉이 오르면 실수령액은?</h2>
+    <p>연봉 {kor(annual)}의 월 공제율은 약 <strong>{deductRate.toFixed(1)}%</strong>입니다. 연봉이 오르면 누진세율 때문에 인상분 전부가 월급에 더해지지는 않습니다. 인상 폭별로 실제 늘어나는 금액은 다음과 같습니다.</p>
+    <table>
+      <tr><th>인상 후 연봉</th><th>월 실수령액</th><th>월 증가분</th><th>인상분 중 실수령 비율</th></tr>
+      {raises.map((x) => <tr><td>{kor(annual + x.d * 10000)} (+{num(x.d)}만원)</td><td>{won(x.net)}</td><td>+{won(x.gain)}</td><td>{x.kept.toFixed(0)}%</td></tr>)}
+    </table>
+    <p>세전 월급 {won(base.grossMonthly)}을 주 40시간 근무(월 209시간, 주휴 포함)로 나누면 시급으로 약 <strong>{won(hourlyEquiv)}</strong>에 해당합니다.</p>
     <h2>퇴직금 포함 연봉이라면</h2>
     <p>연봉에 퇴직금이 포함된 계약(연봉 ÷ 13)이면 세전 월급이 {won(incl.grossMonthly)}으로 줄고, 실수령액은 <strong>약 {won(incl.net)}</strong>이 됩니다. 계약서에 "퇴직금 포함" 문구가 있는지 확인하세요.</p>
     <h2>비과세 식대가 없다면</h2>
@@ -77,10 +94,10 @@ const jsonLd = [
     <h2>{YEAR}년 공제 기준</h2>
     <table>
       <tr><th>항목</th><th>근로자 부담</th></tr>
-      <tr><td>국민연금</td><td>{RATES.np * 100}% (기준소득월액 상한 {num(RATES.npCap)}원)</td></tr>
-      <tr><td>건강보험</td><td>{RATES.hi * 100}%</td></tr>
-      <tr><td>장기요양보험</td><td>건강보험료의 {RATES.ltc * 100}%</td></tr>
-      <tr><td>고용보험</td><td>{RATES.ei * 100}%</td></tr>
+      <tr><td>국민연금</td><td>{pct(RATES.np)}% (기준소득월액 상한 {num(RATES.npCap)}원)</td></tr>
+      <tr><td>건강보험</td><td>{pct(RATES.hi)}%</td></tr>
+      <tr><td>장기요양보험</td><td>건강보험료의 {pct(RATES.ltc)}%</td></tr>
+      <tr><td>고용보험</td><td>{pct(RATES.ei)}%</td></tr>
       <tr><td>소득세</td><td>6~45% 누진세율, 근로소득공제·세액공제 적용 후 12개월 분할</td></tr>
     </table>
     <p class="hint">계산 결과는 참고용 추정치이며, 실제 원천징수액은 회사 규정과 간이세액표에 따라 달라질 수 있습니다.</p>

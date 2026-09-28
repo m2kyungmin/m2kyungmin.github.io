@@ -3,6 +3,7 @@ import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
 import Offers from "../../components/Offers.astro";
+import QuickLinks from "../../components/QuickLinks.astro";
 import { getCollection, render } from "astro:content";
 import { getCalc } from "../../lib/site";
 
@@ -38,4 +39,5 @@ const jsonLd = {
     <Coupang keywords={post.data.products} />
     {calc && <p class="card">🧮 <a href={`/calc/${calc.slug}`}><strong>{calc.title}</strong></a>로 내 경우를 바로 계산해 보세요.</p>}
   </article>
+  <QuickLinks calc={post.data.calc} />
 </Base>

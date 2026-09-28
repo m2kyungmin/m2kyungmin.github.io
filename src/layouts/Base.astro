@@ -9,8 +9,9 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   type?: "website" | "article";
   publishedTime?: string;
+  noindex?: boolean;
 }
-const { title, description, keywords = [], jsonLd, type = "website", publishedTime } = Astro.props;
+const { title, description, keywords = [], jsonLd, type = "website", publishedTime, noindex = false } = Astro.props;
 // build.format:"file" 때문에 빌드 시 Astro.url.pathname 이 "/index.html", "/calc/hourly.html" 형태다.
 // 사이트맵·내부 링크는 확장자 없는 URL(/calc/hourly)을 쓰므로 canonical/og:url 도 같은 형태로 맞춘다.
 // (둘이 다르면 Google 이 "리디렉션/중복" 으로 보고 색인을 미룬다 — Search Console 2026-09-16.)
@@ -33,6 +34,7 @@ ld.push({
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {keywords.length > 0 && <meta name="keywords" content={keywords.join(", ")} />}
+    {noindex && <meta name="robots" content="noindex,follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title={SITE.name} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
