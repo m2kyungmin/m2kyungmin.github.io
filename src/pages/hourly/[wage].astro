@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import TopDisclosure from "../../components/TopDisclosure.astro";
 import Offers from "../../components/Offers.astro";
 import { weeklyPay, MIN_WAGE_2026 } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
@@ -62,6 +63,7 @@ const jsonLd = [
   <nav class="crumbs"><a href="/">홈</a> › <a href="/hourly">시급별 월급</a> › 시급 {num(wage)}원</nav>
   <h1>시급 {num(wage)}원 월급 ({YEAR}년 기준)</h1>
   <p class="lead">시급 {num(wage)}원으로 주 40시간(하루 8시간 × 주 5일) 근무하면, 주휴수당을 포함한 월급은 <strong>약 {won(base.monthly)}</strong>입니다. 연봉으로 환산하면 약 {won(base.annual)}입니다.</p>
+  <TopDisclosure products={["알바 앞치마", "근무 기록 노트"]} calc="hourly" />
   <AdSlot position="top" />
   <div class="result">
     <div>월급 (주휴수당 포함, 세전)</div>

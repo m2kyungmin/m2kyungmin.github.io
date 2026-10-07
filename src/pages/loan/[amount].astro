@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import TopDisclosure from "../../components/TopDisclosure.astro";
 import Offers from "../../components/Offers.astro";
 import { equalPayment, equalPrincipal, bulletTotalInterest } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
@@ -69,6 +70,7 @@ const jsonLd = [
   <nav class="crumbs"><a href="/">홈</a> › <a href="/loan">대출 금액별 이자</a> › 대출 {kor(amount)}</nav>
   <h1>대출 {kor(amount)} 이자 ({YEAR}년 기준)</h1>
   <p class="lead">대출 {kor(amount)}을 연 {RATE_DEFAULT}%, {headlineTerm}년 원리금균등 방식으로 상환하면 월 상환액은 <strong>약 {won(headline.monthly)}</strong>, 총 이자는 <strong>약 {won(headline.totalInterest)}</strong>입니다.</p>
+  <TopDisclosure products={["부동산 계약 책", "가계부"]} calc="loan" />
   <AdSlot position="top" />
   <div class="result">
     <div>월 상환액 (연 {RATE_DEFAULT}%, {headlineTerm}년, 원리금균등)</div>

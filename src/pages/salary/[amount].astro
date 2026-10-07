@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import TopDisclosure from "../../components/TopDisclosure.astro";
 import Offers from "../../components/Offers.astro";
 import { calcAnnual, YEAR, RATES } from "../../lib/salary";
 import { won, kor, num, pct } from "../../lib/format";
@@ -52,6 +53,7 @@ const jsonLd = [
   <nav class="crumbs"><a href="/">홈</a> › <a href="/salary">연봉별 실수령액</a> › 연봉 {kor(annual)}</nav>
   <h1>연봉 {kor(annual)} 실수령액 ({YEAR}년 기준)</h1>
   <p class="lead">연봉 {kor(annual)}의 월 실수령액은 <strong>약 {won(base.net)}</strong>입니다. 세전 월급 {won(base.grossMonthly)}에서 4대보험료와 소득세 {won(base.grossMonthly - base.net)}이 공제된 금액입니다. (월 비과세 20만원, 부양가족 본인 1인 기준)</p>
+  <TopDisclosure products={["가계부", "직장인 재테크 책"]} calc="salary" />
   <AdSlot position="top" />
   <div class="result">
     <div>월 예상 실수령액</div>

@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import AdSlot from "./AdSlot.astro";
 import Coupang from "./Coupang.astro";
+import TopDisclosure from "./TopDisclosure.astro";
 import Offers from "./Offers.astro";
 import QuickLinks from "./QuickLinks.astro";
 import { CALCS, getCalc } from "../lib/site";
@@ -43,6 +44,7 @@ if (faq.length) {
   <nav class="crumbs"><a href="/">홈</a> › <a href="/calc">계산기</a> › {calc.short}</nav>
   <h1>{calc.emoji} {calc.title}</h1>
   <p class="lead">{calc.description}</p>
+  <TopDisclosure products={products} calc={slug} />
   <AdSlot position="top" />
   <section class="card calc">
     <slot />

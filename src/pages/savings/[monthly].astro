@@ -2,6 +2,7 @@
 import Base from "../../layouts/Base.astro";
 import AdSlot from "../../components/AdSlot.astro";
 import Coupang from "../../components/Coupang.astro";
+import TopDisclosure from "../../components/TopDisclosure.astro";
 import Offers from "../../components/Offers.astro";
 import { installmentInterest, depositInterest, afterTax } from "../../lib/finance";
 import { won, kor, num } from "../../lib/format";
@@ -83,6 +84,7 @@ const jsonLd = [
   <nav class="crumbs"><a href="/">홈</a> › <a href="/savings">월 적금액별 만기 수령액</a> › 매달 {num(monthlyMan)}만원</nav>
   <h1>매달 {num(monthlyMan)}만원 적금 ({YEAR}년 기준) 만기 수령액</h1>
   <p class="lead">매달 {num(monthlyMan)}만원씩 연 {RATE_DEFAULT}% 적금에 납입하면 1년 만기 세후 수령액은 <strong>약 {won(headline.total)}</strong>입니다. 아래에서 1년·3년·5년·10년 만기 금액을 함께 확인하세요.</p>
+  <TopDisclosure products={["가계부", "재테크 입문 책"]} calc="compound" />
   <AdSlot position="top" />
   <div class="result">
     <div>1년 만기 세후 수령액 (연 {RATE_DEFAULT}%)</div>

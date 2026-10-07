@@ -1,0 +1,12 @@
+---
+// 페이지 첫머리 대가성 문구. 아래쪽 쿠팡·제휴 박스가 실제로 렌더링될 때만 표시합니다.
+import AdDisclosure from "./AdDisclosure.astro";
+import { COUPANG_ID } from "../lib/monetize";
+import { offersFor } from "../lib/offers";
+interface Props { products?: string[]; calc?: string }
+const { products = [], calc } = Astro.props;
+const coupang = Boolean(COUPANG_ID) && products.length > 0;
+const offers = offersFor(calc).length > 0;
+const who = coupang && offers ? "쿠팡 파트너스 및 제휴마케팅" : coupang ? "쿠팡 파트너스" : "제휴마케팅";
+---
+{(coupang || offers) && <AdDisclosure text={`이 포스팅은 ${who} 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.`} />}
