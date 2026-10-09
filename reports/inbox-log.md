@@ -61,3 +61,6 @@
 
 ## 2026-10-08
 - [조치] adsense-noreply@google.com | 애드센스를 사용하려면 사이트에서 발견된 문제를 수정해야 합니다 (10/7) | mintech.ai.kr 사이트 재검토 결과 여전히 광고 게재 불가, 정책 미준수 문제 존재 | 애드센스 계정 '사이트' 페이지에서 구체적 문제 확인 후 수정, 재검토 요청
+
+## 2026-10-09
+- [정보] Apify · hello@apify.com | Your Actor developer summary for September | 9월 액터 운영 통계 요약, 수익 $0, 이슈 0건 | -
