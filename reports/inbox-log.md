@@ -67,3 +67,7 @@
 
 ## 2026-10-10
 - 새 메일 없음
+
+## 2026-10-11
+- Apify · hello@community.apify.com | Pricing change for Google Ads Transparency Center Scraper: Ad Library (10/10) | kyungminlee/ads-transparency-scraper 액터, 본인이 설정한 가격 변경(Ad $3.00→$2.00/1,000, Advertiser profile $0.01→$0.003) | -
+- Apify · hello@community.apify.com | Pricing change for AI Brand Visibility Report: No API Key Needed (10/10) | kyungminlee/ai-brand-visibility-report 액터, 가격 변경 통지이나 신규/기존 가격 동일($9.00) | -
