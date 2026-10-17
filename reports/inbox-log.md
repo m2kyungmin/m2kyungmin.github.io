@@ -81,3 +81,6 @@
 
 ## 2026-10-14
 - [정보] sc-noreply@google.com | 축하드립니다. 28일 만에 클릭수 10회를 달성하셨습니다. (10/11) | mintech.ai.kr 검색 클릭수 10회 달성 축하 메일, 실적 요약성 안내 | -
+
+## 2026-10-17
+- [주시] Apify · eva.nunez@apify.com | Stricter enforcement against Apify Store manipulation (10/16) | 스토어 조작 행위(가짜 리뷰, 외부 결제 링크 등) 단속 강화 안내, 특정 계정 위반 지적 아닌 전체 공지 | 자신의 액터 리스팅이 해당 규정에 저촉되지 않는지 한 번 점검 권장
