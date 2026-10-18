@@ -84,3 +84,6 @@
 
 ## 2026-10-17
 - [주시] Apify · eva.nunez@apify.com | Stricter enforcement against Apify Store manipulation (10/16) | 스토어 조작 행위(가짜 리뷰, 외부 결제 링크 등) 단속 강화 안내, 특정 계정 위반 지적 아닌 전체 공지 | 자신의 액터 리스팅이 해당 규정에 저촉되지 않는지 한 번 점검 권장
+
+## 2026-10-18
+- [조치] Apify · hello@apify.com | Your Actor Pinterest Scraper: Pins, Boards, Search & Videos has been flagged as under maintenance (10/17) | kyungminlee/pinterest-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
