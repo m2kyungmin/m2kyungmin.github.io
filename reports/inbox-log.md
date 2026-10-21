@@ -93,3 +93,6 @@
 
 ## 2026-10-20
 - 새 메일 없음
+
+## 2026-10-21
+- [정보] Apify · eva.nunez@apify.com | Creator webinar invite: get traffic to your Actors (10/20) | 액터 트래픽 유입을 주제로 한 커뮤니티 개발자 웨비나 초대 안내 | -
