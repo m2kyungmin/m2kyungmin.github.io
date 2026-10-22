@@ -96,3 +96,6 @@
 
 ## 2026-10-21
 - [정보] Apify · eva.nunez@apify.com | Creator webinar invite: get traffic to your Actors (10/20) | 액터 트래픽 유입을 주제로 한 커뮤니티 개발자 웨비나 초대 안내 | -
+
+## 2026-10-22
+- [주시] Apify · hello@community.apify.com | Pricing change for SEC EDGAR Filings & Financials: 10-K, 8-K, Form D (10/21) | kyungminlee/sec-edgar-filings-scraper 액터, 본인이 설정한 가격 변경(Screener row 이벤트 $2.00/1,000 신설, 기존 항목 유지) | -
