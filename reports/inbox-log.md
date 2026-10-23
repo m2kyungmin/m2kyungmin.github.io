@@ -99,3 +99,6 @@
 
 ## 2026-10-22
 - [주시] Apify · hello@community.apify.com | Pricing change for SEC EDGAR Filings & Financials: 10-K, 8-K, Form D (10/21) | kyungminlee/sec-edgar-filings-scraper 액터, 본인이 설정한 가격 변경(Screener row 이벤트 $2.00/1,000 신설, 기존 항목 유지) | -
+
+## 2026-10-23
+- 새 메일 없음
