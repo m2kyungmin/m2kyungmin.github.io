@@ -102,3 +102,7 @@
 
 ## 2026-10-23
 - 새 메일 없음
+
+## 2026-10-24
+- [조치] Apify · hello@apify.com | Your Actor AutoScout24 Scraper: Car Listings, Prices & Specs has been flagged as under maintenance (10/23) | kyungminlee/autoscout24-listings-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
+- [조치] Apify · hello@apify.com | Your Actor ZAP Imóveis & VivaReal Scraper – Brazil Property Listings has been flagged as under maintenance (10/23) | kyungminlee/zap-vivareal-property-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
