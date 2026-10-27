@@ -106,3 +106,14 @@
 ## 2026-10-24
 - [조치] Apify · hello@apify.com | Your Actor AutoScout24 Scraper: Car Listings, Prices & Specs has been flagged as under maintenance (10/23) | kyungminlee/autoscout24-listings-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
 - [조치] Apify · hello@apify.com | Your Actor ZAP Imóveis & VivaReal Scraper – Brazil Property Listings has been flagged as under maintenance (10/23) | kyungminlee/zap-vivareal-property-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
+- [조치] Apify · hello@apify.com | Your Actor Microsoft Ads Library Scraper: Bing Ads & Impressions has been flagged as under maintenance (10/24) | kyungminlee/microsoft-ads-library-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
+- [조치] Apify · hello@apify.com | Your Actor Snapchat Ads Library Scraper: EU Ads & Impressions has been flagged as under maintenance (10/24) | kyungminlee/snapchat-ads-library-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
+
+## 2026-10-25
+- 새 메일 없음
+
+## 2026-10-26
+- [조치] Apify · eva.nunez@apify.com | Rebuild your Node.js Actors to apply security fixes (10/26) | 전체 Node.js 액터 포트폴리오 대상, Apify 베이스 Docker 이미지에 Node.js·인증서 보안 수정 반영됨, 10/21 7pm CEST 이전 빌드된 액터는 재빌드 필요(이미지 태그 고정 시 최신으로 변경 후) | 보유 Node.js 기반 액터 전체 재빌드(Build) 실행하여 보안 패치 반영
+
+## 2026-10-27
+- 새 메일 없음
