@@ -117,3 +117,6 @@
 
 ## 2026-10-27
 - 새 메일 없음
+
+## 2026-10-28
+- [주시] Apify · support@apify.com | Re: Request for failed automated test runs (4 Actors flagged Under maintenance) (10/27) | 10/24 보고한 4개 액터(microsoft-ads-library-scraper, snapchat-ads-library-scraper, zap-vivareal-property-scraper, autoscout24-listings-scraper) 자동 테스트 실패 로그 요청에 대해, 지원팀이 "Support Engineers"에게 이슈를 넘겼다는 회신 (사용자 본인이 이미 주고받은 메일) | 추가 회신 기다리기, 새 조치 없음
