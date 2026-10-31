@@ -126,3 +126,7 @@
 
 ## 2026-10-30
 - [정보] Apify · support@apify.com | Re: Request for failed automated test runs (4 Actors flagged Under maintenance) (10/29) | 10/24 보고한 4개 액터 관련 기존 문의 스레드의 상담 만족도 평가 요청 메일(내용 추가 없음) | -
+
+## 2026-10-31
+- [조치] Apify · luis.pinto@apify.com | Check your Store API calls by November 15 (10/30) | 11/15부터 Store API(GET /v2/store)가 검색 결과를 쿼리 관련도로 재정렬, 기존 offset/total 페이징·sortBy·bookmarkCount 사용 코드가 깨질 수 있음 | Store API를 호출하는 본인 코드/도구가 있는지 확인하고 11/15 전에 페이징·정렬 로직 점검
+- [조치] Apify · hello@apify.com | Your Actor Naver Shopping Search Scraper: Ranks, Ads, Sales has been flagged as under maintenance (10/30) | kyungminlee/naver-shopping-search-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
