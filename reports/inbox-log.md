@@ -136,3 +136,6 @@
 
 ## 2026-11-02
 - 새 메일 없음
+
+## 2026-11-03
+- [정보] Apify · hello@apify.com | A new way to browse Apify Store, plus your agent builds Actors now (11/2) | 10월 업데이트 뉴스레터(스토어 카테고리 개편, 에이전트용 MCP 빌드 기능, 행사 안내 등) | -
