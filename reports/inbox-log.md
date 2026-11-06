@@ -145,3 +145,6 @@
 
 ## 2026-11-05
 - [정보] Apify · eva.nunez@apify.com | Community webinar: How to choose what to build (11/4) | 11/16 커뮤니티 개발자 웨비나(카테고리별 수요 분석) 초대, 11/7까지 질문 제출 시 참가 보상 안내 | -
+
+## 2026-11-06
+- 새 메일 없음
