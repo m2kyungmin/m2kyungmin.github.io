@@ -163,3 +163,8 @@
 
 ## 2026-11-11
 - 새 메일 없음
+
+## 2026-11-12
+- [조치] Apify · hello@apify.com | Important security update (Action required) (11/11) | 11/9~11/10 Apify 내부 시스템에 제3자 무단 접근 발생, 보안팀이 모든 API 토큰·Proxy 비밀번호를 강제 회전시켜 기존 토큰 전부 무효화됨, GitHub 등 일부 OAuth 연동도 해제됨 | 스크레이퍼 CI/CD·n8n/Zapier/Make 등에서 쓰던 Apify API 토큰을 새 토큰으로 전부 교체하고 끊긴 연동 재연결
+- [정보] Apify · hello@apify.com | Your Actor developer summary for October (11/11) | 10월 실적 요약(순이익 $64.84, 순이용자 64명), Naver Shopping Search Scraper는 Under maintenance 상태 유지, Threads/Pinterest/LinkedIn Jobs는 Deprecated 표시 | -
+- [정보] Apify · hello@apify.com | New payout invoice (11/11) | 10월(10/1~10/31) 정산 인보이스 생성, 미승인 시 21일 자동승인, 승인하면 28일 지급 | -
