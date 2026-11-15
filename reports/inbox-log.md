@@ -171,3 +171,9 @@
 
 ## 2026-11-13
 - [조치] Apify · hello@apify.com | Security incident update: your account and payout information were accessed (11/12) | 11/9~11/10 침해 조사 결과 확정: 계정 프로필, 청구 정보(카드 마지막 4자리 등), 인증정보(해시된 비밀번호, 2FA 복구코드, Google/GitHub 로그인 토큰), 정산정보(계좌/IBAN/PayPal·Wise 이메일, 세금ID) 노출 확인됨(Actor 소스코드·실행데이터는 미접근) | 2FA 재설정(별도 안내 따름), GitHub 연동 보안 로그 점검, 정산 계좌·세금정보 변경 여부 모니터링
+
+## 2026-11-14
+- 새 메일 없음
+
+## 2026-11-15
+- 새 메일 없음
