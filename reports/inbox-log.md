@@ -177,3 +177,10 @@
 
 ## 2026-11-15
 - 새 메일 없음
+
+## 2026-11-16
+- [조치] Apify · hello@apify.com | Your Actor Naver Shopping Search Scraper: Ranks, Ads, Sales will be deprecated in 14 days (11/16) | kyungminlee/naver-shopping-search-scraper 액터가 자동 품질 테스트(5분 내 성공 기대) 실패, 14일 내(~11/30) 수정하지 않으면 폐기(deprecated) 처리 | 입력 스키마/액터 점검 후 수정, 필요 시 support@apify.com 문의
+- [정보] Apify · eva.nunez@apify.com | Community webinar: Live from Creators Day India (11/16) | 인도 벵갈루루 Creators Day 현장 커뮤니티 웨비나 초대 안내 | -
+
+## 2026-11-17
+- 새 메일 없음
