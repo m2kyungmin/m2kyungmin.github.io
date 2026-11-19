@@ -187,3 +187,7 @@
 
 ## 2026-11-18
 - 새 메일 없음
+
+## 2026-11-19
+- [조치] Apify · hello@apify.com | Your Actor Property Finder Scraper: UAE Listings, Transactions & Prices has been flagged as under maintenance (11/18) | kyungminlee/propertyfinder-listings-scraper 액터가 최근 3일간 자동 품질 테스트 실패로 "Under maintenance" 상태로 전환됨 | 실패한 실행 로그 확인 후 액터 또는 입력 스키마 수정, 필요 시 자동 테스트 제외 신청
+- [조치] Apify · hello@apify.com | Reminder: Reconnect your Apify integrations (Action required) (11/18) | 11/11~11/12 보안 사고 대응으로 API 토큰 전량 폐기, 일부 연동이 여전히 이전 토큰으로 연결되어 작동 중단됨 | Apify Console에서 새 API 토큰 발급 후 연동된 각 도구(CI/CD 등)에 갱신 적용
