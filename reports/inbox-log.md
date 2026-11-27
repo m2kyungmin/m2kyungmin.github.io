@@ -206,3 +206,7 @@
 
 ## 2026-11-26
 - 새 메일 없음
+
+## 2026-11-27
+- [정보] Apify · support@apify.com | Re: Re: Request for failed automated test runs (4 Actors flagged Under maintenance) (11/26) | 10월에 문의한 4개 액터(microsoft-ads-library-scraper 등)가 모두 Under maintenance 해제되어 정상 표시로 복구 확인, 티켓 종료 | -
+- [정보] Apify · eva.nunez@apify.com | How to build a Server Actor? (11/26) | Server Actor(웹 인터페이스) 구축 방법 웨비나(12/1) 초대 안내 | -
